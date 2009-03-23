@@ -7,17 +7,6 @@
   <script type="text/javascript" charset="utf-8" src="incl/js/jquery-1.3.2.min.js"></script>
   <script type="text/javascript" charset="utf-8">
 
-    var validateFields = function(){
-      if(document.getElementsByName("username")[0].value.length==0){
-        alert("An Email Address has not been entered");
-	document.forms[0].preventDefault();
-      } else if(document.getElementsByName("pwd")[0].value.length==0){
-	alert("Password is Needed");
-      } else {
-	document.forms[0].submit();
-      }
-    }
-
     var ErrorHandler = ( function(){
       var addError = function(msg) {
 	$('#errors span').text(msg);
