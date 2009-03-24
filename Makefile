@@ -1,18 +1,14 @@
 #
-# Makefile
+# Makefile for Poly IUDIS
 #
 
-DATABASE = -L /opt/oracle/lib -I /opt/oracle/rdbms/public
-APPSERVER = logger.o
-# db.o
+#ORACLEDB = -L /opt/oracle/lib -I /opt/oracle/rdbms/public -locci -lclntsh
 
-all: ${APPSERVER} test
+all: iudis
 
-logger.o: Logger.h Logger.cpp
-	g++ -o logger.o -c Logger.cpp
-
-test:
-	g++ -o test test.cpp ${APPSERVER}
+iudis: iudis.cpp
+	g++ -o iudis iudis.cpp -I`pg_config --includedir` -lpq
 
 clean:
-	rm -f test *.o *~
+	rm -f *~ *.o iudis
+
