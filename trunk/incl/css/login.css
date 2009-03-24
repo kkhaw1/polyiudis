@@ -27,4 +27,6 @@
 	-webkit-border-radius:6px;
 	border-radius:6px;
 }
-
+.selected {
+  background-color:#FFB;
+}

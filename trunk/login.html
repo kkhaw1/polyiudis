@@ -2,9 +2,9 @@
 
 <head>
   <title>Polytechnic Institute of NYU: IUDIS</title>
-  <link rel="stylesheet" href="incl/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-  <link rel="stylesheet" href="incl/css/login.css" type="text/css" media="screen" title="no title" charset="utf-8">
-  <script type="text/javascript" charset="utf-8" src="incl/js/jquery-1.3.2.min.js"></script>
+  <link rel="stylesheet" href="http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/incl/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/incl/css/login.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <script type="text/javascript" charset="utf-8" src="http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/incl/js/jquery-1.3.2.min.js"></script>
   <script type="text/javascript" charset="utf-8">
 
     var ErrorHandler = ( function(){
@@ -28,6 +28,13 @@
     })();
 
     $(document).ready( function(){
+      if ( window.location.href.match(/err/) ) {
+	ErrorHandler.addError("Username and password combination not found.");
+	ErrorHandler.showError();
+      }
+
+      $('input').focus( function(){$(this).addClass('selected');}).blur( function() {$(this).removeClass('selected');});
+
       $('#frmLogin').submit( function(e){
 	if ( $('#username').val() == "" ) {
 	  ErrorHandler.addError("Please enter a username");
@@ -45,7 +52,7 @@
   </script>
 </head>
 
-<body><center>
+<body onload="document.getElementById('username').focus();"><center>
   <div id="body_w">
 
     <div id="banner">Banner Box</div>
@@ -54,7 +61,7 @@
 
     <div id="body_panel">
       <div id="loginPanel">      
-        <form method="POST" action="incl/cgi-bin/login.cgi" name="frmLogin" id="frmLogin">
+        <form method="POST" action="login.php" name="frmLogin" id="frmLogin">
 	  <label for="username">Username: </label>
 	  <input type="text" name="username" id="username" />
 	  <br />
