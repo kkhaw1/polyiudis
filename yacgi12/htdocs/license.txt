@@ -1,0 +1,106 @@
+YACGI License Terms
+------------------
+
+Basic License
+-------------
+
+YACGI, copyright 1996-1997 by Andrew Girow (Andriy Zhyrov). 
+Permission is granted to use YACGI in any application, commercial 
+or noncommercial, at no cost. 
+
+HOWEVER, this copyright paragraph MUST APPEAR on a "credits" page 
+accessible in the public online and offline documentation of the 
+program. 
+
+Modified versions of the YACGI library should not be distributed 
+without the attachment of a clear statement regarding the author
+of the modifications, and this notice may in no case be removed. 
+Modifications may also be submitted to the author for inclusion 
+in the main YACGI distribution.                                 
+
+IF YOU WOULD PREFER NOT TO ATTACH THE ABOVE NOTICE to the public 
+documentation of your application, consult the information which 
+follows regarding the availability of a nonexclusive commercial
+license for YACGI.
+
+
+Commercial License
+------------------
+
+The price of a nonexclusive commercial license is $45 U.S. 
+To purchase the license:
+
+1. Make transfer of $45 in U.S. funds, to:
+
+   Acc: 979015-157708
+   Israel Discont Bank, Yad Elyahu Branch, 51519,
+   Dereh Moshe-Dayan 64, Tel-Aviv, Israel
+   Andriy Zhyrov
+
+2. Print and sign two copies of the document below.
+   
+3. Send both copies, along with transfer details to:
+
+   Andriy Zhyrov  29, 5 Serlin Str., Tel-Aviv 67653, Israel
+    
+BE SURE TO INCLUDE AN EMAIL ADDRESS, as well as
+a postal address and phone number.
+
+I will return one signed copy to you promptly.
+
+
+****************************************************************
+
+YACGI Nonexclusive Commercial License
+
+The licensee named below is granted the right to utilize YACGI, 
+major version 1, any minor version thereof, in CGI applications
+without the need for a credit notice of any kind. 
+
+CGI applications developed by the holder of this license may be
+distributed freely in source code or binary form without 
+additional fees or royalties. 
+
+This license does not grant the right to use YACGI to create a 
+development tool which passes on substantially all of the 
+capabilities of the YACGI library to the user of the tool, unless 
+that tool is to be used internally by the license holder only in
+order to develop CGI applications. 
+
+This license may not be resold, but applications developed in 
+accordance with the terms of the license may be distributed
+freely subject to the limitations described above.
+
+Future minor (1.x) versions of YACGI will be covered by this
+license free of charge. If significant defects of workmanship
+are discovered in version 1.x, minor releases to correct them
+will be made available before or at the same time that 
+those defects are addressed in any future major version. 
+
+Future "major" (2.x) versions will be available to licensees at
+an upgrade price of $15.
+
+If, for any reason, any portion of this license is found to be 
+invalid, that portion of the license only is invalidated and the
+remainder of the agreement remains in effect.
+
+If this license has not been signed by Andrew Girow (Andriy Zhyrov). 
+it is invalid.
+
+Licensee:                     _____________________
+
+Complete Mailing Address:     _____________________
+
+                              _____________________
+
+                              _____________________
+
+Phone Number:                 _____________________
+
+Email Address:                _____________________
+
+Signed for Andrew Girow 
+          (Andriy Zhyrov):    _____________________
+
+Date:                         _____________________
+

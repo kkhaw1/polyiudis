@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+<TITLE>
+ YACGI Simple Email Handler (1.1)
+</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<H1>YACGI Simple Email Handler (1.1)</H1>
+<STRONG>Andrew Girow / Andriy Zhyrov /</STRONG><BR>
+<BR>
+<FONT SIZE="-1">Copyright &copy 1997 Andrew Girow. All Rights Reserved.</FONT>
+<P>
+<b>Look at the emailhd.c code.
+ This code is a part of <a href="yacgi.html">YACGI</a> v1.2 libary</b> <BR>
+<pre>
+/* emailhd.c:  Simple CGI Email Handler
+ *
+ *             This code demonstrates the main features of the YACGI
+ *             C/C++ library for CGI programming.
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include "yacgi.h"
+
+/* Where the email configuration file */
+#define EMAIL_CONF_PATH "emailhd.conf"
+
+/* Where the email program */
+#define EMAIL_BINARY "/usr/bin/mail"
+
+main(int argc, char *argv[])
+{
+    CGI  *cgi;
+    char *name;
+    char *email;
+    char *subject;
+    char *recipient;
+    char *content;
+    char recipient_conf[256];
+    char returnpage[256];
+    int   recipient_found;
+    FILE *out;
+    FILE *in;
+    char buf[256];
+
+
+    printf("Content-type: text/html%c%c",10,10);
+    /*-----------------------------------------------------------
+     *              Opening Relation
+     *-----------------------------------------------------------*/
+    cgi = cgiOpen();
+    if(!cgi)
+    {
+       printf("&lt;H3&gt;%s&lt;/H3&gt;%c",cgiStateMsg(),10);
+       exit(1);
+    }
+
+    /*-----------------------------------------------------------
+     *              Evaluating Relation
+     *-----------------------------------------------------------*/
+    name      = cgiValueFirst(cgi, "name");
+    email     = cgiValueFirst(cgi, "email");
+    subject   = cgiValueFirst(cgi, "subject");
+    recipient = cgiValueFirst(cgi, "recipient");
+    content   =  cgiSafeValue(cgi, "content");
+
+    if((name == NULL) || (email == NULL) || 
+      (content == NULL) || (recipient == NULL)) 
+    {
+    	printf("&lt;TITLE&gt;Email Rejected&lt;/TITLE&gt;%c",10);
+    	printf("&lt;H1&gt;Email Rejected&lt;/H1&gt;%c",10);
+	printf("&lt;P&gt;Please fill out all fields provided.&lt;BR&gt;%c",10);
+	printf("Back up to the previous page to try again.&lt;BR&gt;%c",10);
+        cgiClose(cgi);
+        exit(1);
+    }
+
+    /*-----------------------------------------------------------
+     *              Reading Email Configuration File
+     *-----------------------------------------------------------*/
+    in = fopen(EMAIL_CONF_PATH, "r");
+    if(in==NULL)
+    {
+    	printf("&lt;TITLE&gt;Email Rejected&lt;/TITLE&gt;%c",10);
+    	printf("&lt;H1&gt;Email Rejected&lt;/H1&gt;%c",10);
+	printf("&lt;P&gt;Can not open email confiquration file.&lt;BR&gt;%c",10);
+        cgiClose(cgi);
+        exit(1);
+    }
+    
+    recipient_found = 0;
+    while(1) 
+    {
+        if (!fgets(recipient_conf, 80, in))  break;
+        if (!fgets(returnpage, 80, in))      break;
+        if (!strncmp(recipient, recipient_conf, strlen(recipient))) 
+        {
+	  recipient_found = 1;
+	  break;
+        }
+    }
+    fclose(in);
+    if (!recipient_found) 
+    {
+    	printf("&lt;TITLE&gt;Email Rejected&lt;/TITLE&gt;%c",10);
+    	printf("&lt;H1&gt;Email Rejected&lt;/H1&gt;%c",10);
+	printf("&lt;P&gt;%s is not one of the permitted email recipients.%c",
+		recipient,10);
+	printf("Back up to the previous page to try again.%c",10);
+       cgiClose(cgi);
+       exit(1);
+    }
+
+    /*-----------------------------------------------------------
+     *              Sending A Message
+     *-----------------------------------------------------------*/
+    sprintf(buf, "%s %s", EMAIL_BINARY, recipient);
+    out = popen(buf, "w");
+    fprintf(out, "Subject: %s\n", subject);
+    fprintf(out, "Reply-To: %s\n\n", email);
+    fprintf(out, "Supposedly-From: %s\n", name);
+    fprintf(out, "[This message was sent through a www-email gateway.]\n");
+    fprintf(out, "--\n");
+    fprintf(out, "%s\n", content);
+    pclose(out);
+    
+    printf("&lt;TITLE&gt;Message Accepted&lt;/TITLE&gt;%c",10);
+    printf("&lt;H1&gt;Message Accepted&lt;/H1&gt;%c",10);
+    printf("&lt;A HREF=\"%s\"&gt;Follow this link to continue.&lt;/A&gt;%c", returnpage,10);
+
+    /*-----------------------------------------------------------
+     *              Closing Relation
+     *-----------------------------------------------------------*/
+    cgiClose(cgi);
+}
+
+
+</pre>
+<i>This code is a part of YACGI1.2 libary</i> <BR>
+<BR>
+<H2>Configuring</H2>
+Just after the copyright notice in emailhd.c, there are two
+very important definitions you just configure. The first
+defines the location of your email configuration file:
+<PRE>
+#define EMAIL_CONF_PATH "emailhd.conf"
+</PRE>
+The second defines the location
+of the mail binary:
+<PRE>
+#define EMAIL_BINARY "/bin/mail"
+</PRE>
+<H2>Compiling</H2>
+Just go to emailhd directory and type make
+If all goes well the binary emailhd will be the result.
+<H2>Installing</H2>
+Move the emailhd binary to the cgi-bin directory of your
+server.
+<H2>Writing your configuration file</H2>
+Here is my emailhd configuration file 
+<pre>
+andrew
+/girow/index.html
+</pre>
+
+This file contains email addresses alternating
+with the URLs of home pages. For each user, state the user's
+email address and the URL of their home page on your server.
+<P>
+Save this file under the filename you specified for EMAIL_CONF_PATH.
+<H2>Installing a form</H2>
+The last step is to create an actual email form for each user.
+Simply modifying my name and the URL of the email script.
+<P>
+This should be enough information to allow you to set up your own
+email-handling forms. Please contact me if you have any difficulties.
+<p>
+<CENTER><A HREF="index.html"> HOME </A></CENTER><p>
+<FONT SIZE="-1">Copyright &copy 1997 Andrew Girow. All Rights Reserved.</FONT>
+<HR SIZE=3>
+<FONT SIZE="-1">Last updated: July 21, 1997</FONT>
+
+</BODY>
+</HTML>
