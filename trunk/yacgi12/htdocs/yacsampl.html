@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>YACGI Simple Test Fill-Out Form</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<H1>YACGI Simple Test Fill-Out Form</H1>
+
+<FORM METHOD="GET" ACTION="http://balrog/cgi-bin/yacsampl">
+<PRE><B><FONT SIZE=4>Name</FONT></B>
+<UL>First <INPUT SIZE=51 NAME="First_Name">
+Last  <INPUT SIZE=51 NAME="Last_Name"><P></PRE></ul>
+<P>
+<B>Date of Birth</B> <I>Day/Month/Year</I> <INPUT SIZE=8 NAME="D_O_B"><P>
+<B>Sex</B>
+<input type=radio name=Sex value="M">Male.
+<input type=radio name=Sex value="F">Female.<P>
+
+<B>What is the highest level of education you achieved?</B>
+<UL><SELECT NAME="Degree">
+<option>No Bachelors Degree
+<option>BA/Undergraduate Degree
+<option>Masters Degree or higher
+</SELECT><p></UL>
+
+<B>Skills</B><BR><UL>
+<input type=checkbox name=Skills
+value = "Oracle DBAs and Programmer">Oracle DBA and Programmer<BR>
+<input type=checkbox name=Skills
+value = "Informix and Sybase DBA">Informix and Sybase DBA<BR>
+<input type=checkbox name=Skills
+value = "HTML/JAVA/Web Developers">HTML/JAVA/Web Developer<BR>
+<input type=checkbox name=Skills
+value = "Client-Server Architect">Client-Server Architect<BR>
+<input type=checkbox name=Skills
+value = "C++ Programmer">C++ Programmer<BR>
+<input type=checkbox name=Skills
+value = "C/UNIX Programmer">C/UNIX Programmer<BR>
+<P></UL>
+
+<B>Present Occupation</B> <BR><UL>
+Job Title <INPUT SIZE=50 NAME="Occupation"><BR>
+Job Duties <ul><textarea name="Duties" rows=4 cols=47></textarea>
+<BR>
+<P></UL>
+<H3>YACGI Anvanced Features: String, Integer, Real, Safe String</H3>
+String <INPUT SIZE=51 NAME="String"><BR>
+Integer <INPUT SIZE=10 NAME="Integer"><BR>
+Real <INPUT SIZE=10 NAME="Real"><BR>
+Safe String without shell metacharacters<BR>
+<INPUT SIZE=51 NAME="SafeString"><P> 
+
+
+<CENTER><INPUT TYPE="submit" VALUE=" SUBMIT Form ">
+<INPUT TYPE="reset" VALUE=" CLEAR Form "></CENTER>
+</FORM>
+</BODY>
+</HTML>
+

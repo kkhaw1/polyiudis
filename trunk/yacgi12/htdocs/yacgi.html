@@ -1,0 +1,609 @@
+<html>
+<head>
+<title>yacgi: Yet Another C/C++ library for CGI Programming</title>
+</head>
+<BODY BGCOLOR="#ffffff">
+<h1>yacgi: Yet Another C/C++ library for CGI Programming</h1>
+version 1.2<br>
+<STRONG>Andrew Girow / Andriy Zhyrov /</STRONG><BR>
+<BR>
+<FONT SIZE="-1">Copyright &copy 1997 Andrew Girow. All Rights Reserved.</FONT>
+<P>
+<h3>Table of Contents</h3>
+<ul>
+<li><a href="#whatnew">What's new in version 1.2?</a>
+<li><a href="#whatis">Why yacgi?</a>
+<li><a href="#basics">Basic concepts</a>
+<li><a href="#credit">Credits and License Terms</a>
+<li><a href="#obtain">Obtaining yacgi</a>
+<li><a href="#using">Using yacgi</a>
+<li><a href="#reference">yacgi reference</a>
+</ul>
+<hr>
+
+<h2><a name="whatnew">What's new in version 1.2?</a></h2>
+Version 1.02 corrects bugs in previous versions: 
+  <ul> 
+   <li> cgiClose now works propertly.
+  </ul>
+New examples are added     
+  <ul> 
+   <li> <a href="emailhd.html">YACGI Simple Email Handler (1.1)</a>
+  </ul>
+
+<h2><a name="whatis">Why yacgi?</a></h2>
+
+There are two main sources for yacgi:
+<ul>
+<li>
+<a href="http://www.boutell.com/cgic/">CGIC</a>
+    is an ANSI C-language library for the creation of CGI-based
+    World Wide Web applications by
+<a href="http://www.boutell.com/boutell/">Thomas Boutell</a><BR>
+<li>
+<a href="./bra.html"> Binary Relation Approach to Data Modelling</a><BR>
+</ul>
+<p>
+There are two main reasons for yacgi:
+<ul>
+<li>
+    CGIC is an exelect tool but there are some difficults in
+    the library structure and the interface. <BR>
+    <BR>
+    From CGIC 1.05 documentation:<BR>
+<em>
+Since all CGI applications must perform certain initial
+tasks, such as parsing form data and examining
+environment variables, the cgic library provides its
+own main() function. When you write applications that
+use cgic, you will begin your own programs by writing
+a cgiMain() function, which cgic will invoke when
+the initial cgi work has been successfully completed.
+<p>
+...
+<strong>Important:</strong> if you write your own main()
+function, your program will not link properly. Your own
+code should begin with cgiMain(). The library
+provides main() for you.
+<p>
+...
+This function takes advantage of cgiFormCheckboxMultiple(),
+which is used to identify one or more selected checkboxes with
+the same name. This function performs identically to
+cgiFormSelectMultiple().
+That is, &lt;SELECT&gt; tags with the MULTIPLE attribute are handled
+just like a group of several checkboxes with the same name.
+</em><p>... and so on.<p>
+
+    <li> Using Binary Relation Model we can construct very simple and
+         powerful model and library for CGI programming
+</ul>
+<p>
+<hr>
+<h2><a name="basics">Basic concepts</a></h2>
+In general, <STRONG>a binary relation</STRONG> consists of two terms
+<STRONG>a key</STRONG> and <STRONG>a value</STRONG> which refer to
+entities, and a predicate <STRONG>an access function</STRONG> which
+connects the terms by saying something about them.
+<P>
+<PRE>
+<STRONG>example</STRONG>:   "A person works in an enterprise."
+</PRE>
+<P>
+<center><IMG SRC="brapic1.gif"></center>
+<P>
+Picture 1.
+<P>
+In general, an access function is a function which maps one object
+into the powerset of another (the set of all subset).
+While defining a relation one gives the key and value object types
+involved, and one defines the access function and gives information
+about its cardinality. When the cardinal of an access function is
+<STRONG>unique</STRONG> then it is a function. When the cardinal of an
+access function is <STRONG>multiple</STRONG> then it is a multiple-valued
+function.
+<p>
+For the CGI programming (about the CGI standard,
+see the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">
+CGI documentation</a> at NCSA.)
+we can use a very simple model:
+<ul>
+<li>Name-Value Relation
+<li>State of Relation
+<li>CGI Environment
+</ul>
+<center><IMG SRC="yacgi.gif"></center>
+Picture 2. Binary Relation Model of CGI Programming
+<p>
+<hr>
+<h2><a name="credit">Credits and License Terms</a></h2>
+yacgi can be used free of charge, provided that a credit notice is provided online. 
+Alternatively, a nonexclusive Commercial License can be purchased, which grants the right to use cgic without a
+public credit notice. 
+<P>
+Please see the file <a href="license.txt">license</a> for the details of 
+the Basic License and Commercial License,
+including ordering information for the Commercial License. 
+<hr>
+<h2><a name="obtain">Obtaining yacgi</a></h2>
+Your web browser should inquire whether to save the file to disk
+when you select the link below.
+<ul>
+<li><a href="yacgi12_tar.gz">yacgi12_tar.gz</a>
+</ul>
+<hr>
+<h2><a name="using">Using yacgi</a></h2>
+
+There are very few basic concepts that you need to know. We
+describe the concepts as abstract data types. There is a 1:1
+correspondence between YACGI abstract data types and the Binary
+Relations Approach to CGI basic items.
+<P>
+<STRONG>Opening Relation</STRONG><BR>
+This code opens the relation.
+<P>
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include "yacgi.h"
+
+main(int argc, char *argv[])
+{
+    CGI *cgi;
+
+    printf("Content-type: text/html%c%c",10,10);
+    /*-----------------------------------------------------------
+     *              Opening Relation
+     *-----------------------------------------------------------*/
+    cgi = cgiOpen();
+    if(!cgi)
+    {
+       printf("&lt;H3&gt;%s&lt;/H3&gt;%c",cgiStateMsg(),10);
+       exit(1);
+    }
+</PRE>
+<P>
+
+<STRONG>Closing Relation</STRONG><BR>
+You should close the relation before exit the program.
+<PRE>
+    /*------------------------------------------------------
+     *                 Closing Relation.
+     *------------------------------------------------------*/
+    cgiClose(cgi);
+}
+</PRE>
+<P>
+
+<STRONG>Scanning Relation</STRONG><BR>
+You can use traversing or scanning the relation, accessing each
+stored pair of names-values in turn to perform some test or
+action.
+<P>
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include "yacgi.h"
+
+main(int argc, char *argv[])
+{
+    CGI *cgi;
+    int more;
+    char *string;
+
+    printf("Content-type: text/html%c%c",10,10);
+    /*-----------------------------------------------------------
+     *              Opening Relation
+     *-----------------------------------------------------------*/
+    cgi = cgiOpen();
+    if(!cgi)
+    {
+       printf("&lt;H3&gt;%s&lt;/H3&gt;%c",cgiStateMsg(),10);
+       exit(1);
+    }
+    /*-----------------------------------------------------------
+     *              Scanning Relation
+     *-----------------------------------------------------------*/
+    printf("&lt;CENTER&gt;&lt;H2&gt;Scanning Name-Value Relation&lt;/H2&gt;&lt;/CENTER&gt;");
+    printf("You submitted the following name/value pairs:&lt;p&gt;%c",10);
+    printf("&lt;ul&gt;%c",10);
+    more= cgiFirst(cgi);
+    while(more)
+    {
+        printf("&lt;li&gt; &lt;code&gt;%s = %s&lt;/code&gt;%c",cgiName(cgi),
+               cgiValue(cgi),10);
+        more = cgiNext(cgi);
+    }
+    printf("&lt;/ul&gt;%c",10);
+    /*------------------------------------------------------
+     *                 Closing Relation.
+     *------------------------------------------------------*/
+    cgiClose(cgi);
+}
+</PRE>
+<P>
+<STRONG>Evaluating Relation</STRONG><BR>
+<P>
+We can "navigate" from objects to objects using binary
+relation. To do this, we use cgiValueFirst and cgiValueNext functions.
+For instance, we have a Name "sex" and want to know value of sex.
+The code is:
+<P>
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include "yacgi.h"
+
+main(int argc, char *argv[])
+{
+    CGI *cgi;
+    int more;
+    char *string;
+
+    printf("Content-type: text/html%c%c",10,10);
+    /*-----------------------------------------------------------
+     *              Opening Relation
+     *-----------------------------------------------------------*/
+    cgi = cgiOpen();
+    if(!cgi)
+    {
+       printf("&lt;H3&gt;%s&lt;/H3&gt;%c",cgiStateMsg(),10);
+       exit(1);
+    }
+    /*-----------------------------------------------------------
+     *              Evaluating Relation
+     *-----------------------------------------------------------*/
+
+    printf("&lt;CENTER&gt;&lt;H2&gt;Evaluating Name-Value Relation&lt;/H2&gt;&lt;/CENTER&gt;");
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","First Name",10);
+    string = cgiValueFirst(cgi, "First_Name");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Last Name",10);
+    string = cgiValueFirst(cgi, "Last_Name");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Date of Birth",10);
+    string = cgiValueFirst(cgi, "D_O_B");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Sex",10);
+    string = cgiValueFirst(cgi, "Sex");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Degree",10);
+    string = cgiValueFirst(cgi, "Degree");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Current Occupation",10);
+    string = cgiValueFirst(cgi, "Occupation");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Duties",10);
+    string = cgiValueFirst(cgi, "Duties");
+    if(string) printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+
+    /*----------------------------------------------------------
+     * Let us now look at multiple relations. Assume we want the
+     * skills of the person.
+     * We write:
+     *---------------------------------------------------------*/
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Skills",10);
+    string = cgiValueFirst(cgi, "Skills");
+    while(string)
+    {
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",string,10);
+        string = cgiValueNext(cgi, "Skills");
+    }
+    /*------------------------------------------------------
+     *                 Closing Relation.
+     *------------------------------------------------------*/
+    cgiClose(cgi);
+}
+</PRE>
+<P>
+<STRONG>Advanced Features</STRONG><BR>
+<P>
+Provides string, integer, floating-point, and safe string
+without shell metacharacters functions to retrieve form data.
+<P>
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include "yacgi.h"
+
+main(int argc, char *argv[])
+{
+    CGI *cgi;
+    int more;
+    char *string;
+    int flag;
+    long i;
+    double r;
+    char c[31];
+
+
+    printf("Content-type: text/html%c%c",10,10);
+    /*-----------------------------------------------------------
+     *              Opening Relation
+     *-----------------------------------------------------------*/
+    cgi = cgiOpen();
+    if(!cgi)
+    {
+       printf("&lt;H3&gt;%s&lt;/H3&gt;%c",cgiStateMsg(),10);
+       exit(1);
+    }
+    /*-------------------------------------------------------------
+     *              Advanced Features: Input String, Integer, Real,
+     *              Safe String
+     *-----------------------------------------------------------*/
+    printf("&lt;CENTER&gt;&lt;H2&gt;Advanced Features&lt;/H2&gt;&lt;/CENTER&gt;");
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","String",10);
+    flag = cgiValueString(cgi, "String", c, 30);
+    if(flag == CGI_OK || CGI_VAL_TRUNCATED )
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",c,10);
+    else
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",cgiStateMsg(),10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Integer",10);
+    flag = cgiValueInteger(cgi, "Integer", &i, 1);
+    if(flag == CGI_OK )
+        printf("&lt;code&gt;%ld&lt;/code&gt;&lt;br&gt;%c",i,10);
+    else
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",cgiStateMsg(),10);
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","Real",10);
+    flag = cgiValueReal(cgi, "Real", &r, 1);
+    if(flag == CGI_OK )
+        printf("&lt;code&gt;%lf&lt;/code&gt;&lt;br&gt;%c",r,10);
+    else
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",cgiStateMsg(),10);
+
+
+    printf("&lt;p&gt;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;%c","SafeString",10);
+    string = cgiValueFirst(cgi, "SafeString");
+    if(string)
+        printf("&lt;code&gt;%s&lt;/code&gt;&lt;br&gt;%c",cgiSafeStr(string),10);
+    /*------------------------------------------------------
+     *                 Closing Relation.
+     *------------------------------------------------------*/
+    cgiClose(cgi);
+    return(0);
+}
+</PRE>
+<P>
+
+The sample application 'yacsampl.c' is provided as part of the
+yacgi distribution. This CGI program accepts input submitted
+by the form yacsampl.html.
+<p>
+<strong>IMPORTANT:</strong> after compiling yacgi, you will
+need to place it in a location on your server system which is
+designated by your server administrator as an appropriate location
+for CGI scripts. Also, the URL of the action of the sample form in
+yacsampl.html must be changed to correctly indicate the location
+of yacsampl on your web server.
+<p>
+<hr>
+<h2><a name="reference">yacgi reference</a></h2>
+There are very few basic concepts that you need to know. We
+describe the concepts as abstract data types.
+<ul>
+<b><a href="#Relation">Name-Value Relation</a></b> ADT
+available via functions:<br>
+<ul>
+<a href="#cgiOpen">    cgiOpen()</a><br>
+<a href="#cgiClose">     cgiClose()</a><br>
+<a href="#cgiValueFirst"> cgiValueFirst()</a><br>
+<a href="#cgiValueNext"> cgiValueNext()</a><br>
+<a href="#cgiFirst">     cgiFirst()</a><br>
+<a href="#cgiNext">      cgiNext()</a><br>
+<a href="#cgiName">      cgiName()</a><br>
+<a href="#cgiValue">     cgiValue()</a><br>
+and advanced functions:<br>
+<a href="#cgiSafeValue">    cgiSafeValue() </a><br>
+<a href="#cgiValueString">  cgiValueString()</a><br>
+<a href="#cgiValueInteger"> cgiValueInteger()</a><br>
+<a href="#cgiValueReal">    cgiValueReal()</a><br>
+<p>
+</ul>
+<b><a href="#State">State of Relation</a></b> ADT available via functions:<br>
+<ul>
+<a href="#cgiStateClear">  cgiStateClear()</a><br>
+<a href="#cgiStateGet">  cgiStateGet()</a><br>
+<a href="#cgiStateSet">    cgiStateSet()</a><br>
+<a href="#cgiStateMsg">    cgiStateMsg()</a><br>
+</ul>
+<p>
+<b><a href="#Environment">CGI Environment</a></b> ADT available via functions:<br>
+<ul>
+<a href="#cgiEnvGet">  cgiEnvGet()</a><br>
+</ul>
+</ul>
+<p>
+<p>
+<ul>
+<hr>
+<b><a name="Relation">Name-Value Relation</a></b> is accessed via the following operations,
+that can change <a href="#State">State of Relation</a>.
+<hr>
+<CITE>Open/Close functions:</CITE>
+<BR>
+<BR><STRONG><a name="cgiOpen">CGI   *cgiOpen();</a></STRONG><BR>
+Opens a Name-Value binary relation with the given name. On successful
+completion, cgiOpen returns a pointer to the open relation. In
+the event of error, it returns null.
+<P>
+<BR><STRONG><a name="cgiClose">void   cgiClose(CGI *cgi);</a></STRONG><BR>
+Closes the relation.
+<P>
+<CITE>Evaluate functions:</CITE>
+<BR>
+<BR><STRONG><a name="cgiValueFirst">char *cgiValueFirst(CGI *cgi, char *Name);</a>
+</STRONG><BR>
+Evaluates the first Value in the relation by the supplied
+Name. Returns the first Value in the
+relation that has a given Name. Null is returned if no pair
+meets the condition. In the event of error it returns 0.
+<P>
+<BR><STRONG><a name="cgiValueNext">char *cgiValueNext(CGI *cgi, char *Name);</a>
+</STRONG><BR>
+Evaluates the next Value in the relation by the supplied Name.
+Returns the next Value in the relation
+that has a given Name. Null is returned if no pair meets the
+condition.  In the event of error it returns 0.
+<P>
+<CITE>Iterate functions:</CITE>
+<BR>
+<BR><STRONG><a name="cgiFirst">int cgiFirst(CGI *cgi);</a></STRONG><BR>
+Moves the current position to the first stored pair. On
+successful completion, cgiFirst returns 1. In the event of
+error it returns 0.
+<P>
+<BR><STRONG><a name="cgiNext">int cgiNext(CGI *cgi);</a></STRONG><BR>
+Moves the current position to the next stored pair. On
+successful completion, cgiNext returns 1. In the event of
+error it returns 0.
+<P>
+
+<BR><STRONG><a name="cgiName">char *cgiName(CGI *cgi);</a></STRONG><BR>
+Returns a Name of the current pair. If
+there is an error or if the relation is empty it returns 0.
+<P>
+<BR><STRONG><a name="cgiValue">char  *cgiValue(CGI *cgi);</a></STRONG><BR>
+Returns a Value of the current pair. If
+there is an error or if the relation is empty it returns 0.
+<P>
+<CITE>Advanced features:</CITE>
+<BR>
+<BR><STRONG><a name="cgiSafeValue">char *cgiSafeValue(CGI *cgi, char *Name);</a>
+</STRONG><BR>
+Evaluates the first Value in the relation by the supplied
+Name.
+<BR>Returns the first Value in the
+relation that has a given Name and ESCAPES the shell metacharacters.
+<BR>Null is returned if no pair meets the condition.
+In the event of error it returns 0.
+<P>
+<BR><STRONG><a name="cgiValueString">int cgiValueString(CGI *cgi, char *name,
+char *result, int max);</a></STRONG><BR>
+Evaluates the first Value in the relation by the supplied
+Name.<BR>The string will be copied into the buffer specified by result,
+up to but not exceeding max-1 bytes.<BR><BR>
+The function returns <a href="#State">CGI_OK</a> if the Value was successfully retrieved.
+<BR>
+If the string was retrieved but was truncated to fit the buffer it
+returns <a href="#State">CGI_VAL_TRUNCATED</a>,<BR>
+<a href="#State">CGI_VAL_EMPTY</a> if the string was retrieved but was empty, and
+<BR><a href="#State">CGI_VAL_NOTFOUND</a> if no such Name was submitted.
+<P>
+<BR><STRONG><a name="cgiValueInteger">int cgiValueInteger(CGI *cgi,
+char *name, long *result, long defval);</a> </STRONG><BR>
+Evaluates the first Value in the relation by the supplied
+Name.<BR>
+The value pointed to by result will be set to the value submitted.
+<BR>
+The function returns <a href="#State">CGI_OK</a>if the Value was
+successfully retrieved,<BR>
+<a href="#State">CGI_VAL_EMPTY</a>if the Value submitted is an empty string,<BR>
+<a href="#State">CGI_VAL_BADTYPE</a> if the Value submitted is not an integer,<BR>
+and <a href="#State">CGI_VAL_NOTFOUND</a> if no such Name
+was submitted.<BR>
+In the last three cases, the Value pointed to by result
+is set to the specified default.
+<P>
+<BR><STRONG><a name="cgiValueReal">int cgiValueReal(CGI *cgi, char *name,
+double *result, double defval);</a></STRONG><BR>
+Evaluates the first Value in the relation by the supplied
+Name.<BR> The value pointed to by result will be set to the value submitted.
+<BR>
+The function returns <a href="#State">CGI_OK</a>if the Value was
+successfully retrieved,
+<a href="#State">CGI_VAL_EMPTY</a>if the Value submitted is an empty string,<BR>
+<a href="#State">CGI_VAL_BADTYPE</a> if the Value submitted is not a real number,<BR>
+and <a href="#State">CGI_VAL_NOTFOUND</a> if no such Name
+was submitted.<BR>
+In the last three cases, the Value pointed to by result
+is set to the specified default.
+<P>
+<hr>
+<b><a name="State">State of Relation</a></b> can be one of the following
+<hr>
+<p>
+<CENTER><TABLE BORDER=1 CELLSPACING=1 CELLPADDING=1>
+<TR>
+<TD> CGI_OK  </TD>
+<TD> The function successfully performed </TD>
+</TR>
+<TR>
+<TD> CGI_MEMORY                  </TD>
+<TD> Out-of-memory error         </TD>
+</TR>
+<TR>
+<TD> CGI_CONTENTTYPE             </TD>
+<TD> MIME content type error     </TD>
+</TR>
+<TR>
+<TD> CGI_REQUESTMETHOD           </TD>
+<TD> Request metod error         </TD>
+</TR>
+<TR>
+<TD> CGI_IO                      </TD>
+<TD> I/O error                   </TD>
+</TR>
+<TR>
+<TD> CGI_VAL_TRUNCATED           </TD>
+<TD> Value was cut short         </TD>
+</TR>
+<TR>
+<TD> CGI_VAL_INVALID             </TD>
+<TD> Value was not a legal type  </TD>
+</TR>
+<TR>
+<TD> CGI_VAL_EMPTY               </TD>
+<TD> Value contained no data     </TD>
+</TR>
+<TR>
+<TD> CGI_VAL_NOTFOUND </TD>
+<TD> No value was submitted      </TD>
+</TR>
+<TR>
+<TD> CGI_LASTERROR               </TD>
+</TR>
+</TABLE></CENTER>
+<P>
+<b>State of Relation</b> is accessed via the following operations:
+<P>
+<BR><STRONG><a name="cgiStateClear">void cgiStateClear();</a></STRONG><BR>
+Resets state of Name-Value Relation to CGI_OK
+<p>
+<BR><STRONG><a name="cgiStateGet">int  cgiStateGet();</a></STRONG><BR>
+Returns current state of Name-Value Relation
+<p>
+<BR><STRONG><a name="cgiStateSet">int  cgiStateSet(int val);</a></STRONG><BR>
+Resets state of Name-Value Relation to the given value
+<p>
+<BR><STRONG><a name="cgiStateMsg">char *cgiStateMsg();</a></STRONG><BR>
+Returns state of Name-Value Relation string
+<p>
+<hr>
+<b><a name="Environment">CGI Environment</a></b> ADT available via functions:<br>
+<hr>
+<BR><STRONG><a name="cgiEnvGet">char *cgiEnvGet(char *var);</a></STRONG><BR>
+Obtains the current value of the CGI environment, var
+<p>
+The CGI standard specifies a number of environment variables
+which are set by the server.
+<p>
+Instead of calling getenv() you can use cgiEnvGet function
+that always returns valid C strings (they are never null, although
+they may point to an empty string).
+</ul>
+<CENTER><A HREF="index.html"> HOME </A></CENTER><p>
+<FONT SIZE="-1">Copyright &copy 1997 Andrew Girow. All Rights Reserved.</FONT>
+<HR SIZE=3>
+<FONT SIZE="-1">Last updated: July 21, 1997</FONT>
+</BODY>
+</HTML>

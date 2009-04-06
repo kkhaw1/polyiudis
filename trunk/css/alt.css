@@ -1,0 +1,35 @@
+#nav, #foot {
+	margin:0;
+	margin-bottom:10px;
+	background: #E4E4E4 url('http://pdc-amd01.poly.edu/~kkhawa01/Test/incl/img/navbg.gif') scroll repeat-x 0 0;
+	padding:1px 0;
+	padding-right:10px;
+	border:1px solid #AAA;
+}
+#nav a {
+	display:block;
+	float:left;
+	text-decoration:none;
+	padding:6px 12px 6px 12px;
+	line-height:120%;
+	color:#333;
+	font-weight:bold;
+	border-left-color:#FFF;
+	border-right-color:#AAA;
+	border-left-width:1px;
+	border-right-width:1px;
+	border-left-style:solid;
+	border-right-style:solid;
+}
+#nav a:hover {
+	background-color:#666;
+	color:#FFF;
+}
+#nav .right {
+	padding:4px 12px;
+	float:right;
+}
+#nav .left {
+	padding:6px 12px;
+	float:left;
+}
