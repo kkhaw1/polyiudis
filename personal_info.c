@@ -43,13 +43,10 @@ void printPersonalInfo() {
   p.city = PQgetvalue( theResult, 0, 7);
   p.state = PQgetvalue( theResult, 0, 8);
   p.zip = atoi( PQgetvalue( theResult, 0, 9) );
-  p.phone = PQgetvalue( theResult, 0, 11);
+  p.phone = PQgetvalue( theResult, 0, 10);
   p.role = PQgetvalue( theResult, 0, 13);
   
   printf("Content-type: text/html%c%c", 10, 10);
-  printf("<html>");
-  printf("<body>");
-  printf("<script type=\"text/javascript\" charset=\"utf-8\" src=\"js/jquery-1.3.2.min.js\"></script>");
   printf("<script type='text/javascript'>");
   printf("var person = (function(){return {");
   printf("id:'%d',", p.id);
@@ -65,7 +62,8 @@ void printPersonalInfo() {
   printf("role:'%s'", p.role);
   printf("};})();");
   printf("</script>");
-  printf("</body>");
-  printf("</html>");
+
+  PQclear(theResult);
+  PQfinish( conn );
 }
 

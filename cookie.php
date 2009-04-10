@@ -1,19 +1,16 @@
 <?php
+session_start();
 
-if ( isset($_GET['userid']) ) setcookie("userid", $_GET['userid']);
-if ( isset($_GET['username']) ) setcookie("username", $_GET['username']);
-if ( isset($_GET['roleid']) ) setcookie("roleid", $_GET['roleid']);
+if( isset($_GET['action']) && $_GET['action'] == "logout") {
+  session_destroy();
+  header('Location: login.html');
+  exit;
+} else {
+  $_SESSION['userid'] = $_GET['userid'];
+  $_SESSION['username'] = $_GET['username'];
+  $_SESSION['roleid'] = $_GET['roleid'];
+  $_SESSION['role'] = $_GET['role'];
 
-?>
+  header('Location: '.$_SESSION['role'].'');
+}
 
-<html>
-  <head>
-    <title></title>
-  </head>
-<?php
-  $role = $_GET[role];
-  $jsCmd = "window.location.href='http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/$role.php';";
-  echo "<body onload=\"" . $jsCmd. "\">";
-?>
-  </body>
-</html>
