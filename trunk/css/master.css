@@ -6,14 +6,12 @@ html, body {
   background-color:#F9F4F5;
 }
 #body_w {
-  position:fixed;
   width:1000px;
   left:0;
   right:0;
   margin:10px auto 0 auto;
 }
 #body_panel {
-	position:relative;
   width:800px;
   left:0;
   right:0;
@@ -22,12 +20,14 @@ html, body {
 }
 #foot {
 	border:1px solid #000;
+	left:0;
+	right:0;
 	width:1000px;
+	text-align:center;
 	clear:both;
 }
 #foot span {
 	display:block;
-	float:left;
 	text-decoration:none;
 	padding:6px 12px 6px 12px;
 	line-height:120%;
@@ -43,7 +43,7 @@ html, body {
 #nav, #foot {
 	margin:0;
 	margin-bottom:10px;
-	background: #E4E4E4 url('http://pdc-amd01.poly.edu/~kkhawa01/Test/incl/img/navbg.gif') scroll repeat-x 0 0;
+	background: #E4E4E4 url('../img/navbg.gif') scroll repeat-x 0 0;
 	padding:1px 0;
 	padding-right:10px;
 	border:1px solid #AAA;

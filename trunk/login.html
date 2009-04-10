@@ -28,11 +28,6 @@
     })();
 
     $(document).ready( function(){
-      $('#foot').css({
-        position:'fixed',
-        top:$(window).height() - $('#foot').height() - 10
-      });
-
       if ( window.location.href.match(/error=true/) ) {
       	ErrorHandler.addError("Username and password combination not found.");
       	ErrorHandler.showError();
@@ -72,15 +67,13 @@
   	  <span>Please Enter Your Login Information:</span><br />
       <div id="loginPanel"> 
         <form method="POST" action="cgi-bin/login.cgi" name="frmLogin" id="frmLogin">
-      	  <label for="username">Username: </label><input type="text" name="username" id="username" /><br />
-          <label for="pwd">Password: </label><input type="password" name="pwd" id="pwd" /><br />
+      	  <label for="username">Username: </label><input type="text" name="username" id="username" value="narmak101"/><br />
+          <label for="pwd">Password: </label><input type="password" name="pwd" id="pwd" value="qwerty" /><br />
           <button id="login">Login</button>
         </form>
       </div>
     </div>
-
     <div id="foot"><span>--Footer--</span><div style="clear:both"></div></div>
-
   </div>
 </body>
 

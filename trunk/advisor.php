@@ -15,7 +15,7 @@
 <html>
   <head>
     <?
-      echo "<title>Polytechnic IUDIS - Student Home: ". $_SESSION['username'] ."</title>";
+      echo "<title>Polytechnic IUDIS - Advisor Home: ". $_SESSION['username'] ."</title>";
     ?>
     <link rel="stylesheet" href="css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
@@ -67,31 +67,11 @@
                 person.state = $('#state').val();
                 person.zip = $('#zip').val();
                 person.phone = $('#phone').val();
-                showPersonalInfo(head);
+                showPersonalInfo('<h3>Personal Info</h3>');
                 $('#frmPInfo #btnUpdate').removeAttr('disabled').val('Update');
               });
               return false;
             });
-        };
-        
-        var showClassInfo = function() {
-          $table = $content.append('<table cellspacing="0" cellpadding="3"/ align="center" style="text-align:center;width:750px;font-size:12px;">').find('table');
-          $table.append('<thead />').find('thead').append('<tr><td>Course Number</td><td>Course</td><td>Term</td><td>Credits</td><td>Professor</td><td>Professor Email</td></tr>');
-          $table.append('<tbody />');
-          for( var i=0; i<classes.numCourses; ++i ) {
-            var classObj = classes['class'+i];
-            $table.find('tbody').append('<tr />').find('tr:last')
-                  .append('<td id="coursenum">'+ classObj.coursenum +'</td>')
-                  .append('<td id="coursename">'+ classObj.name +'</td>')
-                  .append('<td id="term">'+ classObj.term +'</td>')
-                  .append('<td id="credits">'+ classObj.credits +'</td>')
-                  .append('<td id="prof">Prof. '+ (!classObj.lname ? 'TBA' : classObj.fname +' '+ classObj.lname ) +'</td>')
-                  .append('<td id="email">'+ (!classObj.email ? '-' : classObj.email) +'</td>');
-          }
-          if( classes.numCourses == 0 ) {
-            $table.find('tbody').append('<tr />').find('tr:last').append('<td colspan="6">-Not Scheduled For Any Classes-</td>');
-          }
-          
         };
 
         var _init = function() {
@@ -106,25 +86,6 @@
               $content.append(data);
               showPersonalInfo(head);
               addBlur(person);
-            });
-          });
-          $('#classes').live( 'click', function() {
-            $content.html('<h3>Class History</h3>');
-            $.post('cgi-bin/cinfo.cgi', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
-              showClassInfo();
-            });
-          });
-          $('#grades').live( 'click', function() {
-            $content.html('').html('<h3>Grades History</h3>');
-            $.post('cgi-bin/', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
-            });
-          });
-          $('#grad').live( 'click', function() {
-            $content.html('').html('<h3>Graduation Requirements</h3>');
-            $.post('cgi-bin/', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
             });
           });
         };
@@ -156,9 +117,6 @@
 
     <div id="nav" style="cursor:pointer;text-align:center;margin-top:-11px;">
       <a href="#" id="p_info"> View Personal Information </a>
-      <a href="#" id="classes"> View Current Classes </a>
-      <a href="#" id="grades"> View Grades </a>
-      <a href="#" id="grad"> View Graduation Requirements </a>
       <div style="clear:both"> </div>
     </div>
 
