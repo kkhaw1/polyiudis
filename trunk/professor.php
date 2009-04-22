@@ -39,6 +39,17 @@
             }
           });
         };
+        var showRoster = function() {
+          $content.find('.view_roster').die('click');
+          $content.find('.view_roster').live('click', function() {
+            $('#class_list').find( 'table#' + $(this).attr('id')).toggle('slow');
+            if ( $(this).find('input').val() == 'View Class Roster' ) {
+              $(this).find('input').val('Hide Class Roster');
+            } else {
+              $(this).find('input').val('View Class Roster');
+            }
+          });
+        };
         
         var showPersonalInfo = function(head) {
           $content.html(head);
@@ -73,11 +84,122 @@
               return false;
             });
         };
+        
+        var showClassList = function(head) {
+          $content.html(head);
+          var $roster=new Array();
+          var click = new Array();
+          var $list = $content.append('<table id="class_list" border="0" align="center" cellspacing="0" cellpadding="5" width="100%" />').find('#class_list');
+          $list.append("<thead />").find('thead').append('<tr />').find('tr')
+                .append('<td align="center">Course Number</td>')
+                .append('<td align="center">Course Name</td>')
+                .append('<td align="center">Term</td>')
+                .append('<td align="center">Class Count</td>').append('<td></td>');
+          $list = $list.append('<tbody />').find('tbody');
+          for( var i=0; i < classlist.numCourses; ++i) {
+            $list.append('<tr />').find('tr:last')
+                  .append('<td align="center">'+ classlist['class' + i].coursenum +'</td>')
+                  .append('<td align="center">'+ classlist['class' + i].name +'</td>')
+                  .append('<td align="center">'+ classlist['class' + i].term +'</td>')
+                  .append('<td align="center">'+ classlist['class' + i].numStudents +'</td>')
+                  .append('<td class="view_roster" id="roster'+i+'" align="center" style="cursor:pointer;"><input id="btnV" type="button" value="View Class Roster" /></td>');
+            $roster[i] = $list.append('<tr>').find('tr:last').append('<td colspan="5" align="right"/>').find('td').append('<table id="roster'+i+'" border="0" align="right" cellspacing="0" cellpadding="5"/>').find('#roster' + i);
+            $roster[i] = $roster[i].append('<tbody />').find('tbody');
+            for( var j=0; j < classlist['class'+i].numStudents; ++j) {
+              $roster[i].append('<tr />').find('tr:last')
+                        .append('<td>'+ classlist['class'+i].roster['student'+j].id +'</td>')
+                        .append('<td>'+ classlist['class'+i].roster['student'+j].lname +'</td>')
+                        .append('<td>'+ classlist['class'+i].roster['student'+j].fname +'</td>')
+                        .append('<td>'+ classlist['class'+i].roster['student'+j].email +'</td>');
+            }
+            if (classlist['class'+i].numStudents == 0){
+              $roster[i].append('<tr><td colspan="4">No Students Registered</td></tr>');
+            }
+            $('#class_list').find('table#roster'+i).hide();
+          }
+        };
+        
+        var updateGrade = function( elem ) {
+          var gradeid = $(elem).find('option:selected').data('id');
+          var studentid = $(elem).find('option:selected').data('studentid');
+          var classid = $(elem).find('option:selected').data('classid');
+          var qry = "UPDATE class_roster SET gradeid='" +gradeid+ "' WHERE studentid='" +studentid+ "' and classnum='" +classid+ "'";
+          $.post('cgi-bin/query.cgi', {query:qry}, function(){
+            $content.find('#msgBox').text('Successfully gave grade of ' +grades['grade'+ (gradeid-1)].letter);
+            $(elem).parent('div').css({fontWeight:'normal'});
+          });
+        };
+        
+        var selectChange = function() {
+          var index = $content.find('#classDropList option:selected').data('classnum') - 1;
+          
+          $roster = $content.find('#gradingRoster');
+          $roster.html('<span style="text-decoration:underline;font-weight:bold;padding:15px;">' + classgradelist['class'+index].coursename + '</span>');
+          for( var i=0; i< classgradelist['class'+index].numStudents; ++i) {
+            var student = classgradelist['class'+index].roster['student'+i];
+            $roster.append('<div id="student'+i+'" style="line-height:25px;margin:15px;padding:5px 20px;" />').find('#student'+i)
+                    .append('<div style="width:300px;background-color:#CCC;">'+ student.studentid + ' ' + student.lname +', '+ student.fname + '</div>')
+                    .append('<div style="margin-left:15px;">' + student.email +'</div>')
+                    .append('Grades: <select id="gradeDropList" />')
+                    .append('<hr />');
+            for( var j=0; j< grades.numGrades; ++j) {
+              $roster.find('#student'+i).find('#gradeDropList').append('<option id="grade'+j+'">'+ grades['grade'+j].letter +'</option>');
+              $content.find('#student'+i+' #gradeDropList #grade'+j).data('id',grades['grade'+j].id);
+              $content.find('#student'+i+' #gradeDropList #grade'+j).data('studentid',student.studentid);
+              $content.find('#student'+i+' #gradeDropList #grade'+j).data('classid', $content.find('#classDropList option:selected').data('classnum'));
+              $content.find('#student'+i+' #gradeDropList #grade'+j).data('letter',grades['grade'+j].value);
+              $content.find('#student'+i+' #gradeDropList #grade'+j).data('value',grades['grade'+j].letter);
+            }            
+            if( student.gradeid != '' ) {
+              $roster.find('#student'+ i +' #gradeDropList option[selected]').removeAttr('selected');
+              $roster.find('#student'+ i +' #gradeDropList option#grade' + (student.gradeid-1) ).attr('selected','selected');
+            } else {
+              $roster.find('#student'+i).css({fontWeight:'bold'});
+            }
+            $content.find('#student'+i+' #gradeDropList').change( function(){ updateGrade(this); } )
+          }
+          if (classgradelist['class'+index].numStudents == 0){
+            $roster.append('<div style="font-weight:bold;">No Students Registered</div>');
+          }
+        };
+        
+        var showGrades = function(head) {
+          $content.html(head);
+          $content.append('<div id="msgBox" />');
+          // Add a drop down with classes
+          $dropList = $content.append('<select id="classDropList" style="margin-left:400px;" />').find('#classDropList');
+          for( var i=0; i< classgradelist.numCourses; ++i) {
+            $dropList.append('<option id="option'+i+'">'+ classgradelist['class'+i].coursenum + ' - ' + classgradelist['class'+i].coursename +'</option>');
+            $content.find('#classDropList #option'+i).data('coursename',classgradelist['class'+i].coursename);
+            $content.find('#classDropList #option'+i).data('coursenum',classgradelist['class'+i].coursenum);
+            $content.find('#classDropList #option'+i).data('classnum',classgradelist['class'+i].classnum);
+          }
+          $content.find('#classDropList').change( function(){ selectChange(); } ).change();
+          
+          $roster = $content.append('<div id="gradingRoster" style="text-align:left;" />').find('#gradingRoster');
+        };
 
         var _init = function() {
           $content = $('#main').append('<div id="content" />').find('#content');
           $('#logout').live( 'click', function() {
             window.location.href = "cookie.php?action=logout";
+          });
+          
+          $('#c_list').live( 'click', function() {
+            var head='<h3>Class List</h3>';
+            $.post('cgi-bin/clist.cgi', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
+              $content.append(data);
+              showClassList(head);
+              showRoster();
+            });
+          });
+          
+          $('#grades').live( 'click', function() {
+            var head='<h3>Grade Your Students</h3>';
+            $.post('cgi-bin/grade.cgi', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
+              $content.append(data);
+              showGrades(head);
+            });
           });
 
           $('#p_info').live( 'click', function() {
@@ -88,6 +210,7 @@
               addBlur(person);
             });
           });
+          $('#c_list').trigger('click');
         };
 
         return {
@@ -116,6 +239,8 @@
     </div>
 
     <div id="nav" style="cursor:pointer;text-align:center;margin-top:-11px;">
+      <a href="#" id="c_list"> View Classes </a>
+      <a href="#" id="grades"> Grade Students </a>
       <a href="#" id="p_info"> View Personal Information </a>
       <div style="clear:both"> </div>
     </div>
