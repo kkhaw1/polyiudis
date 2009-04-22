@@ -15,7 +15,7 @@
 <html>
   <head>
     <?
-      echo "<title>Polytechnic IUDIS - Student Home: ". $_SESSION['username'] ."</title>";
+      echo "<title>Polytechnic IUDIS - Department Head Home</title>";
     ?>
     <link rel="stylesheet" href="css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
@@ -37,6 +37,68 @@
                 border:'1px solid #000'
               });
             }
+          });
+        };
+        
+        var createUName = function() {
+          var fname = $content.find('#fname').val();
+          var lname = $content.find('#lname').val();
+          var uname = fname.substr(0, fname.length/2);
+          uname += lname.substr(0, 2 * lname.length/3);
+          alert(uname);
+        }
+        
+        var addNewHire = function(head) {
+          $content.html(head);
+          var userid = parseInt( qry_result.tuple0.increment_by ) + parseInt( qry_result.tuple0.last_value );
+
+          var qry = "SELECT * FROM roles where role!='student' order by roleid";
+          $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+            $content.append(data);
+            $roles = $('<select id="roles" />');
+            $roles.append('<option id="dflt">Select Role</option>');
+            for( var i = 0; i < qry_result.numTuples; ++i ) {
+              $roles.append('<option id="role' +i+ '">' + qry_result['tuple'+i].role.toUpperCase() + '</option>');
+              $roles.find('#role'+i).data('roleid', qry_result['tuple'+i].roleid);
+            }
+            
+            $form = $content.append('<form id="frmAddHire" method="POST" action="cgi-bin/query.cgi" />').find('#frmAddHire');
+            $form.append('<table align="center" border="0px" cellpadding="3px" cellspacing="0" width="45%" />').find('table').append('<tbody />').find('tbody')
+                  .append('<tr><td>UserID: </td><td>' + userid + '</td></tr>')
+                  .append('<tr><td>First Name:</td><td><input type="text" id="fname" /></td></tr>')
+                  .append('<tr><td>Last Name:</td><td><input type="text" id="lname" /></td></tr>')
+                  .append('<tr><td>Username: </td><td><input type="text" id="uname" /></td></tr>')
+                  .append('<tr><td>Password: </td><td><input type="password" id="pass" /></td></tr>')
+                  .append('<tr><td>Email: </td><td><input type="text" id="email" /></td></tr>')
+                  .append('<tr><td>Address: </td><td><input type="text" id="address" /></td></tr>')
+                  .append('<tr><td>City: </td><td><input type="text" id="city" /></td></tr>')
+                  .append('<tr><td>State: </td><td><input type="text" id="state" /></td></tr>')
+                  .append('<tr><td>Zip: </td><td><input type="text" id="zip" /></td></tr>')
+                  .append('<tr><td>Phone: </td><td><input type="text" id="phone" /></td></tr>')
+                  .append('<tr><td>Salary:</td><td>$<input type="text" id="pay" /></td></tr>')
+                  .append('<tr><td>Choose Degree: </td><td id="roleopts"></td></tr>')
+                  .append('<tr><td colspan="2" align="right"><input type="submit" id="btnAdd" style="padding:3px;border:1px solid #000;cursor:pointer;" value="Add New Hire" /></td></tr>');
+            $form.find('#roleopts').html( $roles );
+            $('#frmAddHire').submit( function(e) {
+              e.preventDefault();
+              if( $content.find('#fname').val() == '' || $content.find('#lname').val() == '' || $content.find('#pass').val() == '' || $content.find('#email').val() == ''|| $content.find('#address').val() == '' ||
+              $content.find('#city').val() == '' || $content.find('#state').val() == '' || $content.find('#zip').val() == '' || $content.find('#phone').val() == '' || $content.find('#uname').val() == '' ||
+              $content.find('#roles option:selected').attr('id') == 'dflt' || $content.find('#pay').val() == '' || isNaN(parseInt($content.find('#pay').val())) ) {
+                alert("Please fill out completely, and try again.");
+                return false;
+              } else {
+                var roleid=$content.find('#roles option:selected').data('roleid');
+                var qry = "INSERT INTO users VALUES(DEFAULT, '"+$content.find('#uname').val()+"', '"+$content.find('#pass').val()+"', '"+$content.find('#email').val()+"',";
+                qry += " '"+$content.find('#fname').val()+"', '"+$content.find('#lname').val()+"', '"+$content.find('#address').val()+"', '"+$content.find('#city').val()+"',";
+                qry += " '"+$content.find('#state').val()+"', '"+$content.find('#zip').val()+"', '"+$content.find('#phone').val()+"', " +roleid+ ")";
+                $.post('cgi-bin/query.cgi', {query:qry});
+                var qry2 = "INSERT INTO staff VALUES('" +userid+ "', '" + $content.find('#pay').val() + "', NOW())";
+                $.post('cgi-bin/query.cgi', {query:qry2}, function() {
+                  $content.append('<div id="msgBox" />'). find('#msgBox').text('Successfully added ' + $content.find('#fname').val()+' '+$content.find('#lname').val() + ' as a new Staff Member.' );
+                });
+              }
+              return false;
+            });
           });
         };
         
@@ -74,47 +136,19 @@
             });
         };
         
-        var showClassInfo = function() {
-          $table = $content.append('<table cellspacing="0" cellpadding="3"/ align="center" style="text-align:center;width:750px;font-size:12px;">').find('table');
-          $table.append('<thead />').find('thead').append('<tr><td>Course Number</td><td>Course</td><td>Term</td><td>Credits</td><td>Professor</td><td>Professor Email</td></tr>');
-          $table.append('<tbody />');
-          for( var i=0; i<classes.numCourses; ++i ) {
-            var classObj = classes['class'+i];
-            $table.find('tbody').append('<tr />').find('tr:last')
-                  .append('<td id="coursenum">'+ classObj.coursenum +'</td>')
-                  .append('<td id="coursename">'+ classObj.name +'</td>')
-                  .append('<td id="term">'+ classObj.term +'</td>')
-                  .append('<td id="credits">'+ classObj.credits +'</td>')
-                  .append('<td id="prof">Prof. '+ (!classObj.lname ? 'TBA' : classObj.fname +' '+ classObj.lname ) +'</td>')
-                  .append('<td id="email">'+ (!classObj.email ? '-' : classObj.email) +'</td>');
-          }
-          if( classes.numCourses == 0 ) {
-            $table.find('tbody').append('<tr />').find('tr:last').append('<td colspan="6">-Not Scheduled For Any Classes-</td>');
-          }
-        };
-
-        var showGradeInfo = function() {
-          $table = $content.append('<table cellspacing="0" cellpadding="3"/ align="center" style="text-align:center;width:750px;font-size:12px;">').find('table');
-          $table.append('<thead />').find('thead').append('<tr><td>Course Number</td><td>Course</td><td>Professor</td><td>Professor Email</td><td>Grade</td></tr>');
-          $table.append('<tbody />');
-          for( var i=0; i<grades.numCourses; ++i ) {
-            var classObj = grades['class'+i];
-            $table.find('tbody').append('<tr />').find('tr:last')
-                  .append('<td id="coursenum">'+ classObj.coursenum +'</td>')
-                  .append('<td id="coursename">'+ classObj.name +'</td>')
-                  .append('<td id="prof">Prof. '+ (!classObj.lname ? 'TBA' : classObj.fname +' '+ classObj.lname ) +'</td>')
-                  .append('<td id="email">'+ (!classObj.email ? '-' : classObj.email) +'</td>')
-                  .append('<td id="email">'+ (!classObj.letter ? '-' : classObj.letter) +'</td>');
-          }
-          if( classes.numCourses == 0 ) {
-            $table.find('tbody').append('<tr />').find('tr:last').append('<td colspan="6">-Not Scheduled For Any Classes-</td>');
-          }
-        };
-
         var _init = function() {
           $content = $('#main').append('<div id="content" />').find('#content');
           $('#logout').live( 'click', function() {
             window.location.href = "cookie.php?action=logout";
+          });
+          
+          $('#add_emp').live( 'click', function() {
+            var head='<h3>Add New Hire</h3>';
+            var qry = 'select last_value, increment_by from users_id_seq';
+            $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+              $content.append(data);
+              addNewHire(head);
+            });
           });
 
           $('#p_info').live( 'click', function() {
@@ -123,26 +157,6 @@
               $content.append(data);
               showPersonalInfo(head);
               addBlur(person);
-            });
-          });
-          $('#classes').live( 'click', function() {
-            $content.html('<h3>Class History</h3>');
-            $.post('cgi-bin/cinfo.cgi', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
-              showClassInfo();
-            });
-          });
-          $('#grades').live( 'click', function() {
-            $content.html('<h3>Grades History</h3>');
-            $.post('cgi-bin/vgrade.cgi', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
-              showGradeInfo();
-            });
-          });
-          $('#grad').live( 'click', function() {
-            $content.html('').html('<h3>Graduation Requirements</h3>');
-            $.post('cgi-bin/', {userid:<? echo $_SESSION['userid']; ?>}, function(data) {
-              $content.append(data);
             });
           });
         };
@@ -173,10 +187,8 @@
     </div>
 
     <div id="nav" style="cursor:pointer;text-align:center;margin-top:-11px;">
+      <a href="#" id="add_emp"> Add New Employee </a>
       <a href="#" id="p_info"> View Personal Information </a>
-      <a href="#" id="classes"> View Current Classes </a>
-      <a href="#" id="grades"> View Grades </a>
-      <a href="#" id="grad"> View Graduation Requirements </a>
       <div style="clear:both"> </div>
     </div>
 
