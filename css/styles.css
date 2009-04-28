@@ -331,6 +331,66 @@ p#help_info {
   font-size:11px;
   
 }
+#ad_req, #app_inv {
+  border:1px dotted #000;
+  margin:3px 5px 2em 5px;
+  padding:3px 5px;
+  font-size:12px;
+  text-align:left;
+}
+#ad_req span, #app_inv span {
+  font-weight:bold;
+  font-size:105%;
+}
+#frmadd_req {
+  float:right;
+  display:block;
+}
+#req_box {
+  width:200px;
+  margin:2px 2px;
+  padding:2px 5px;
+  border:1px solid #AAA;
+}
+#req_box div{
+  padding-left:5px;
+  border-bottom:1px dotted #CCC;
+}
+#app_inv .invoices {
+  font-size:12px;
+  border:1px solid #000;
+  width:100%;
+  margin:3px 2px;
+  padding:2px;
+}
+#app_inv .invoices tr td, #inv_hist .invoices tr td {
+  border-bottom:1px dotted #000;
+  font-size:90%;
+}
+
+#inv_hist {
+  font-size:12px;
+  margin:1.5em 1px 1em 1px;
+  border:1px solid #CCC;
+}
+#inv_hist .invoices{
+  font-size:12px;
+  width:100%;
+  border:1px solid #000;
+  text-align:center;
+}
+#new_inv {
+  margin:3px 0px;
+  padding:3px 5px;
+  text-align:left;
+}
+#new_inv #tblInv, #frmInv input{
+  font-size:12px;
+  border:1px solid #000;  
+}
+label span {
+  font-size:90%;
+}
 
 /*-----------------Footer----------------------*/
 #foot {
