@@ -13,10 +13,21 @@
 ?>
 
 <html>
-  <head>
-    <?
-      echo "<title>Polytechnic IUDIS - Department Head Home</title>";
-    ?>
+<head>
+  <?
+    echo "<title>Polytechnic IUDIS - Department Head Home</title>";
+  ?>
+  <link charset="utf-8" title="no title" media="screen" type="text/css" href="css/styles.css" rel="stylesheet">
+  <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/application.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/msg_handler.js"></script>
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready( function() {
+      ApplicationObj.init( <?php echo $_SESSION['userid'] .',\''. $_SESSION['role'] .'\',\''. $_SESSION['username'] .'\''; ?> );
+    });
+  </script>
+
+    <!--
     <link rel="stylesheet" href="css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
     <script type="text/javascript" charset="utf-8">
@@ -48,7 +59,7 @@
           alert(uname);
         }
         
-        var addNewHire = function(head) {
+        var admin_addNewHire = function(head) {
           $content.html(head);
           var userid = parseInt( qry_result.tuple0.increment_by ) + parseInt( qry_result.tuple0.last_value );
 
@@ -102,6 +113,47 @@
           });
         };
         
+        var admin_assignClass = function(head) {
+          $content.html(head);
+          $content.append('<span id="reset">Reset</span>');
+          console.log(          $content.find('span#reset').length);
+          $content.find('span#reset').click(function(){
+            console.log("ReSET");
+            $('#assign_classes').trigger('click');
+          });
+          $prof = $content.append('<div id="profs" style="text-align:left;"/>').find('#profs');
+          $crs = $content.append('<div id="crs" style="float:right;border:1px solid #000;text-align:left;line-height:30px;z-index:1;"/> <div style="clear:both;"> </div>').find('#crs');
+          for( var i=0; i<qry_result.numTuples; ++i) {
+            $prof.append('<div id="prof'+qry_result['tuple'+i].id+'" style="cursor:pointer"> ' + qry_result['tuple'+i].lname + ', ' + qry_result['tuple'+i].fname + '<div id="courses" /> </div>');
+            $prof.find('#prof' + qry_result['tuple'+i].id).data('id', qry_result['tuple'+i].id);
+            $prof.find('div').die('click').live('click', function(){
+              var prof = this;
+              var qry='select * from course where instructorid is null';
+              $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+                $crs.html(data);
+                for( var j=0; j< qry_result.numTuples; j++ ) {
+                  $crs.append('<div id="crs' +qry_result['tuple'+j].classnum+ '" style="cursor:pointer;padding:3px;"> ' + qry_result['tuple'+j].coursenum + ' - ' + qry_result['tuple'+j].name + ' </div>');
+                  $crs.find('#crs'+qry_result['tuple'+j].classnum).data('classnum', qry_result['tuple'+j].classnum);
+                  $crs.find('#crs'+qry_result['tuple'+j].classnum).data('coursenum', qry_result['tuple'+j].coursenum);
+                  $crs.find('#crs'+qry_result['tuple'+j].classnum).data('name', qry_result['tuple'+j].name);
+                }
+                $content.append('<input id="btnAssignClass" type="button" value="Assign Class(es)" />').find('#btnAssignClass').click( function(){
+                  var qry = "Update course set instructorid='" + $(prof).data('id') + "' where classnum='" + $(prof).find('span:first').attr('id') + "'";
+                  for( var q=1; q < $(prof).find('span').length; ++q ) { qry+=" or classnum='" + $(prof).find('span:eq(' + q + ')').attr('id') + "'";}
+                  console.log(qry);
+                });
+                $crs.find('div').die('click').live('click', function(){
+                  if ( $(prof).find('span#' + $( '#' + $(this).attr('id') ).data('classnum')).length == 0 ) {
+                    $(prof).find('#courses').append('<span id="' + $('#' + $(this).attr('id')).data('classnum') + '">' + $('#' + $(this).attr('id')).data('coursenum') + '</span>, ')
+                  }
+                });
+                
+              });
+            });
+          }
+          
+        };
+        
         var showPersonalInfo = function(head) {
           $content.html(head);
           $form = $content.append('<form id="frmPInfo" method="POST" action="cgi-bin/query.cgi" />').find('#frmPInfo');
@@ -142,12 +194,21 @@
             window.location.href = "cookie.php?action=logout";
           });
           
-          $('#add_emp').live( 'click', function() {
+          $('#admin_add_emp').live( 'click', function() {
             var head='<h3>Add New Hire</h3>';
             var qry = 'select last_value, increment_by from users_id_seq';
             $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
               $content.append(data);
               addNewHire(head);
+            });
+          });
+          
+          $('#admin_assign_classes').live( 'click', function() {
+            var head='<h3>Assign Classes</h3>';
+            var qry ="select * from users as u, roles as r where u.roleid=r.roleid and role='professor'";
+            $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+              $content.append(data);
+              assignClass(head);
             });
           });
 
@@ -173,8 +234,52 @@
       });
 
     </script>
-  </head>
+    !-->
+</head>
 
+<body>
+  <div id="head">
+    <div id="right_title" class="title"><a href="http://www.poly.edu">Polytechnic Institute of NYU</a></div>
+    <div id="left_title" class="title"><a href="index.php">Integrated University Department Information System</a></div>
+  </div>
+
+  <div id="nav_bar">
+    <div id="links">
+      <a href="index.php">Home</a>
+      <a href="about.php">About</a>
+      <a href="#" id="admin_show_emp">Employee Lists</a>
+      <a href="#" id="admin_add_emp">New Hire</a>
+      <a href="#" id="admin_assign_classes">Assign Classes</a>
+      <a href="#" id="admin_manage_inv">Manage Invoices</a>
+      <a href="#" id="create_invoice">Create Invoice</a>
+      <a href="#" id="p_info">View Personal Information</a>
+      <a href="#" id="logout" class="last">Logout</a>
+    </div>
+  </div>
+
+  <div id="msg_box">
+    <span>MsgBox</span>
+  </div>
+
+  <div id="main">
+    <div id="right_col">
+      <i>Coming Soon...<br />
+      Department Wide Announcements</i>
+    </div>
+    
+    <div id="left_col">
+      <div style="font-size:85%;">Signed in as <strong>&laquo;<?php echo $_SESSION['username']; ?>&raquo;</strong>.</div>
+      <div id="content"></div>
+    </div>
+    
+    <div style="clear:right;"></div>
+  </div>
+  
+  <div id="foot">
+    -Developed by Group B6-
+  </div>
+</body>
+<!--
   <body>
     <div id="body_w">
 
@@ -188,6 +293,7 @@
 
     <div id="nav" style="cursor:pointer;text-align:center;margin-top:-11px;">
       <a href="#" id="add_emp"> Add New Employee </a>
+      <a href="#" id="assign_classes"> Assign Classes </a>
       <a href="#" id="p_info"> View Personal Information </a>
       <div style="clear:both"> </div>
     </div>
@@ -201,5 +307,5 @@
 
     </div>
   </body>
-
+!-->
 </html>
