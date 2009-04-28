@@ -1,80 +1,84 @@
 <html>
 
 <head>
-  <title>Polytechnic Institute of NYU: IUDIS</title>
-  <link rel="stylesheet" href="css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-  <link rel="stylesheet" href="css/login.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link charset="utf-8" title="no title" media="screen" type="text/css" href="css/styles.css" rel="stylesheet">
   <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
-  <script type="text/javascript" charset="utf-8">
-
-    var ErrorHandler = ( function(){
-      var addError = function(msg) {
-        $('#errors span').text(msg);
-      };
-      var showError = function(){
-        if ( $('#errors span').length > 0 ) {
-          $('#errors').stop().animate({opacity:1},300).animate({opacity:0},5000);
-        }
-      };
-
-      return {
-        addError: function(msg) {
-          addError(msg);
-        },
-        showError: function() {
-          showError();
-        }
-      };
-    })();
-
+  <script type="text/javascript" charset="utf-8" src="js/msg_handler.js"></script>
+  
+  <script type="text/javascript">
     $(document).ready( function(){
+      $('#nav_bar a:last').addClass('selected');
+      $('#login').css({fontWeight:'bold'});
       if ( window.location.href.match(/error=true/) ) {
-      	ErrorHandler.addError("Username and password combination not found.");
-      	ErrorHandler.showError();
+      	MsgHandler.addMsg("Username and password combination not found.");
+      	MsgHandler.showMsg();
       }
 
       $('input').focus( function(){$(this).addClass('selected');}).blur( function() {$(this).removeClass('selected');});
 
       $('#frmLogin').submit( function(e){
 	      if ( $('#username').val() == "" ) {
-	        ErrorHandler.addError("Please enter a username");
-	        ErrorHandler.showError();
+	        MsgHandler.addMsg("Please enter a username");
+	        MsgHandler.showMsg();
 	        return false;
 	      } else if ( $('#pwd').val() == "" ) {
-	        ErrorHandler.addError("Please enter a password");
-	        ErrorHandler.showError();
+	        MsgHandler.addMsg("Please enter a password");
+	        MsgHandler.showMsg();
 	        return false;
 	      }
 	      return true;
       });
     });
-
   </script>
+  
+  <title>Integrated University Department Information System</title>
 </head>
 
-<body>
-  <div id="body_w">
+<body onload="document.getElementById('username').focus()">
 
-    <div id="nav">
-      <a href="http://www.poly.edu/">Polytechnic Institute of NYU</a> 
-      <a href="http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/" id="cat">IUDIS</a> 
-      <div style="clear:both"> </div>
+  <div id="head">
+    <div id="right_title" class="title"><a href="http://www.poly.edu">Polytechnic Institute of NYU</a></div>
+    <div id="left_title" class="title"><a href="index.php">Integrated University Department Information System</a></div>
+  </div>
+
+  <div id="nav_bar">
+    <div id="links">
+      <a href="index.php">Home</a>
+      <a href="about.php">About</a>
+      <a href="login.html" class="last">Login</a>
     </div>
+  </div>
 
-    <div id="errors"><span></span></div>
+  <div id="msg_box">
+    <span>MsgBox</span>
+  </div>
 
-    <div id="body_panel">
-  	  <span>Please Enter Your Login Information:</span><br />
+  <div id="main">
+    <div id="right_col">
+      <div id="login">
+      <div>Sign into your IUDIS account:</div>
       <div id="loginPanel"> 
         <form method="POST" action="cgi-bin/login.cgi" name="frmLogin" id="frmLogin">
-      	  <label for="username">Username: </label><input type="text" name="username" id="username" value="admin"/><br />
-          <label for="pwd">Password: </label><input type="password" name="pwd" id="pwd" value="asdf" /><br />
+      	  <label for="username">Username:&nbsp;</label><input type="text" name="username" id="username" /><br />
+          <label for="pwd">Password:&nbsp;&nbsp;</label><input type="password" name="pwd" id="pwd" /><br />
           <button id="login">Login</button>
         </form>
       </div>
+      </div>
     </div>
-    <div id="foot"><span>--Footer--</span><div style="clear:both"></div></div>
+    
+    <div id="left_col">
+      <p>Welcome to polyIUDIS, an online department wide information system.</p>
+    </div>
+    
+    <div style="clear:right;"></div>
   </div>
+  
+  <div id="foot">
+    -Developed by Group B6-
+  </div>
+
 </body>
 
 </html>

@@ -1,0 +1,341 @@
+html, body {
+  margin:0;
+  padding:0;
+  background:#8DC63F url(../bg_grad.png) repeat-y scroll 0 0;
+  text-align:center;
+  font-family:arial block, sans-serif;
+  font-size:15px;
+}
+
+a, a:visited, a:hover {
+  color:#FFF;
+  text-decoration:none;
+}
+
+#head {
+  width:100%;
+  margin:0px 0px 40px 0px;
+  padding:4px 0px;
+  background:#532F91 url(../bg_head_grad_strip.png) repeat scroll 0 -10px;
+  border-bottom:1px solid #8DC63F;
+}
+#head a:hover {
+  background:#000 url(../bg_head.jpg) repeat-x scroll 0 0;
+}
+#head .title {
+  margin:0px auto;
+  padding:1px;
+  text-align:left;
+  font-size:13px;
+  font-weight:bold;
+  color:#FFF;
+}
+#head #left_title.title  {
+  padding-left:3px;
+}
+#head #right_title.title  {
+  float:right;
+  padding-right:3px;
+}
+
+#nav_bar {
+  background:transparent;
+  margin:0;
+  padding:0;
+}
+#links {
+  background:transparent;
+  width:1000px;
+  margin:10px auto 0 auto;
+  padding:0;
+  text-align:right;
+}
+#links a {
+  margin:-3px;
+  padding:4px 7px 0px 7px;
+  border-top:1px solid #CCC;
+  border-left:1px solid #CCC;
+  border-right:1px solid #CCC;
+  -moz-border-radius-topleft:5px;
+  -moz-border-radius-topright:5px;
+  font-size:15px;
+  color:#FFF;
+  text-decoration:none;
+  background:#8DC63F url(../link_grad.png) repeat-x scroll 0 0;
+}
+#links a.selected {
+  background:#532F91 url(../bg_head_grad_strip.png) repeat scroll 0 0;
+  color:#CCC;
+  font-weight:bold;
+  padding-top:8px;
+}
+#links a:visited {
+  color:#FFF;
+}
+#links a:hover {
+  background:#532F91;
+}
+#links a.last {
+  margin-right:-7px;
+}
+
+#msg_box {
+  -moz-border-radius-bottomleft:6px;
+  -moz-border-radius-bottomright:6px;
+  -moz-border-radius-topleft:6px;
+  -moz-border-radius-topright:6px;
+  background-color:#FFF1A8;
+  border:2px solid #000;
+  display:block;
+  left:0;
+  right:0;
+  margin:3px auto 0;
+  padding:4px 10px;
+  position:fixed;
+  font-weight:bold;
+  font-size:110%;
+  text-align:center;
+  width:500px;
+  z-index:1;
+  opacity:0;
+}
+
+#main {
+  border:1px solid #000;
+  -moz-border-radius-topleft:5px;
+  -moz-border-radius-bottomright:5px;
+  -moz-border-radius-bottomleft:5px;
+  width:1000px;
+  margin:0px auto;
+  padding:15px 6px 15px 6px;
+  background-color:#FFF;
+  text-direction:left;
+}
+#main #left_col {
+  width:600px;
+  border:1px solid #BBB;
+  background-color:#FFF;
+  padding:3px 6px;
+  text-align:justify;
+}
+#main #right_col {
+  float:right;
+  width:350px;
+  border:1px solid #BBB;
+  padding:3px 6px;
+}
+
+#login, #login label {
+  margin:1px 0;
+  padding:2px 0;
+}
+#login input {
+  border:1px solid #000;
+  margin:2px 3px;
+  width:100px;
+}
+
+#content {
+  padding:2em 1px;
+}
+
+#tblPinfo {
+  border:1px solid #CCC;
+  margin:auto;
+  padding:3px;
+  width:50%;
+}
+#tblPinfo #key{
+  padding:1px 4px;
+  width:100px;
+  font-size:80%;
+  font-weight:bold;
+}
+#tblPinfo #val{
+  font-size:90%;
+  width:150px;
+}
+#tblPinfo #val input {
+  font-size:75%;
+  border:1px solid #CCC;
+  color:#555;
+}
+/*-----------------Students----------------------*/
+#tbl_stud_class_info, #tbl_stud_grade_info {
+  margin:auto;
+  padding:2px;
+  width:100%;
+  border:1px solid #CCC;
+  text-align:center;
+  font-size:12px;
+}
+#tbl_stud_class_info, #tbl_stud_grade_info {
+  padding:1px;
+}
+#tbl_stud_class_info thead, #tbl_stud_grade_info thead {
+  font-size:90%;
+  font-weight:bold;
+}
+#tbl_stud_class_info #coursenum, #tbl_stud_grade_info #coursenum {
+  width:5%;
+}
+#tbl_stud_class_info #email, #tbl_stud_class_info #coursename }
+  width:30%;
+}
+#tbl_stud_grade_info tr, #tbl_stud_grade_info td {
+  padding:3px 5px;
+}
+
+/*-----------------Professors----------------------*/
+#prof_class_list {
+  margin:auto;
+  padding:2px;
+  width:100%;
+  border:1px solid #CCC;
+  text-align:center;
+  font-size:12px;
+}
+#prof_class_list thead {
+  font-size:90%;
+  font-weight:bold;
+}
+#prof_class_list .view_roster {
+  width:15px;
+  cursor:pointer;
+  background:transparent url(../plus.png) no-repeat 1px 1px;
+}
+#prof_class_list .view_roster img{
+  display:none;
+}
+#prof_class_list #coursenum {
+  text-align:left;
+  width:15px;
+}
+#prof_class_list .prof_roster {
+  margin:2px auto;
+  border:1px solid #CCC;
+  background:#EEE;
+  text-align:center;
+  width:65%;
+  font-size:12px;
+}
+#prof_class_list .prof_roster #rost_id {
+  width:10%;
+}
+#prof_class_list .prof_roster #rost_name {
+  width:40%;
+  text-align:left;
+}
+#classDropList {
+  margin:5px auto;
+  padding:1px 1px;
+  text-align:center;
+}
+#gradingRoster {
+  background:#DDD;
+  padding:5px;
+  font-size:12px;
+}
+#gradingRoster span {
+  font-size:12px;
+  font-weight:bold;
+  margin:auto;
+  padding:1px;
+}
+#gradingRoster .student {
+   margin:15px;
+   padding:5px 20px;
+   border:1px solid #CCC;
+}
+
+/*-----------------Advisor----------------------*/
+#advStudList {
+  margin:5px auto;
+  width:100%;
+  font-size:12px;
+  text-align:center;
+  border:1px solid #CCC;
+}
+#advStudList thead {
+  font-weight:bold;
+  font-size:90%;
+}
+#adv_stud_box {
+  position:absolute;
+  margin:auto;
+  padding:5px 5px;
+  background:#FFF url(../bg_grad.png) repeat-y 0 0;
+  border:2px solid #000;
+  width:1000px;
+  top:100px;
+  text-align:center;
+  display:block;
+  font-size:12px;
+}
+#adv_stud_box table {
+  font-size:12px;
+  padding:3px 5px;
+}
+#adv_new_stud, #admin_tblNewHire {
+  border:1px solid #CCC;
+  margin:auto;
+  padding:3px;
+  width:50%;
+  font-size:12px;
+  text-align:center;
+}
+#adv_new_stud input, #admin_tblNewHire input {
+  border:1px solid #000;
+  width:125px;
+}
+
+/*-----------------Admin----------------------*/
+.emp {
+  text-align:justify;
+  padding:.5em 3px;
+  font-size:12px;
+}
+#reset_container {
+  width:50px;
+  margin:1em 3em;
+  color:#00F;
+  font-size:11px;
+  cursor:pointer;
+}
+#profs {
+  font-size:12px;
+  padding:6px 5px;
+  width:200px;
+  border:1px solid #000;
+  text-align:left;
+  cursor:pointer;
+}
+#profs div {
+  border-bottom:1px dotted #CCC;
+}
+#profs div #courses span {
+  margin-left:10px;
+  color:#00F;
+}
+#crs {
+  float:right;
+  border:1px solid #000;
+  text-align:left;
+  font-size:12px;
+  z-index:1;
+  cursor:pointer;
+}
+p#help_info {
+  margin:3px 3px;
+  padding:15px 3px;
+  font-size:11px;
+  
+}
+
+/*-----------------Footer----------------------*/
+#foot {
+  margin:2px auto;
+  padding:2em 3px 2em 3px;
+  font-size:75%;
+  clear:both;
+}
