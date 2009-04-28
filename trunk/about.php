@@ -1,32 +1,13 @@
 <?php
   session_start();
-  // Check to see if they are logged in
-  if( !isset($_SESSION['userid']) ) {
-    header('Location:http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/login.html');
-  }
-  // Check to see if they have access to the current page
-  preg_match('/(?<fname>[a-zA-Z]+).php/', getenv('SCRIPT_NAME'), $matches);
-  if( $_SESSION['role'] != $matches['fname'] ) {
-    // They should not be here, so send them back
-    header('Location:'. ( (!$_SESSION['role'])?'login.html':$_SESSION['role'] . '.php') );
-  }
 ?>
 
 <html>
 <head>
-  <?
-    echo "<title>Polytechnic IUDIS - Accounting Home</title>";
-  ?>
+  <title>Polytechnic IUDIS - About Us</title>
   <link rel="shortcut icon" href="favicon1.ico">
   <link charset="utf-8" title="no title" media="screen" type="text/css" href="css/styles.css" rel="stylesheet">
   <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
-  <script type="text/javascript" charset="utf-8" src="js/application.js"></script>
-  <script type="text/javascript" charset="utf-8" src="js/msg_handler.js"></script>
-  <script type="text/javascript" charset="utf-8">
-    $(document).ready( function() {
-      ApplicationObj.init( <?php echo $_SESSION['userid'] .',\''. $_SESSION['role'] .'\',\''. $_SESSION['username'] .'\''; ?> );
-    });
-  </script>
 </head>
 
 <body>
@@ -39,8 +20,6 @@
     <div id="links">
       <a href="index.php">Home</a>
       <a href="about.php">About</a>
-      <a href="#" id="create_invoice">Create Invoice</a>
-      <a href="#" id="p_info">View Personal Information</a>
       <a href="#" id="logout" class="last">Logout</a>
     </div>
   </div>
@@ -57,7 +36,9 @@
     
     <div id="left_col">
       <div style="font-size:85%;">Signed in as <strong>&laquo;<?php echo $_SESSION['username']; ?>&raquo;</strong>.</div>
-      <div id="content"></div>
+      <div id="content">
+        <p></p>
+      </div>
     </div>
     
     <div style="clear:right;"></div>

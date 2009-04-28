@@ -54,6 +54,76 @@ var ApplicationObj = (function() {
         return false;
       });
   };
+  
+  // Show and Create Invoices
+  var create_invoices = function(head) {
+    $content.html(head);
+    $table = $('<table class="invoices"/>');
+    $table.append('<thead />').find('thead')
+          .append('<tr><th>Made On</th><th>Request Type</th><th>Description</th><th>Cost</th><th>Fill By</th><th>Approved</th></tr>')
+          .end().append('<tbody />');
+    if( qry_result == null ) {
+      $table.find('tbody').append('<tr />').find('tr:last')
+            .append('<td colspan="6">No Invoices Filed</td>')
+    } else {
+      for( var i=0; i < qry_result.numTuples; ++i ) {
+        var inv = qry_result['tuple'+i];
+        console.log(inv);
+        $table.find('tbody').append('<tr />').find('tr:last')
+              .append('<td>' +inv.madeon+ '</td>')
+              .append('<td>' +inv.req_desc+ '</td>')
+              .append('<td>' +inv.description+ '</td>')
+              .append('<td>' +inv.cost+ '</td>')
+              .append('<td>' +inv.fillby+ '</td>')
+              .append('<td>' +(inv.approved=='t'?'Yes':'No')+ '</td>');
+      }
+    }
+    
+    // New Invoice Form
+    $frmInv = $('<form id="frmInv" action="#" method="POST" />');
+    $frmInv.append('<table id="tblInv" />').find('table')
+            .append('<tr><td><label for="req_type">Request Type:</label></td><td><select id="req_type"><option id="dflt">Select Request Type</option></select></td></tr>');
+    var qry="select * from request_type order by req_desc";
+    $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+      $content.append(data);
+      for( var i=0; i<qry_result.numTuples; ++i ) {
+        var type = qry_result['tuple'+i];
+        $frmInv.find('#req_type').append('<option id="option'+i+'">' +type.req_desc+ '</option>')
+               .find('option:last').data('request_data',type);
+      }
+      $frmInv.find('table')
+             .append('<tr><td><label for="descr">Description:</label></td><td>&nbsp;&nbsp;<input type="text" id="descr" /></td></tr>')
+             .append('<tr><td><label for="cost">Cost:</label></td><td>$<input type="text" id="cost" /></td></tr>')
+             .append('<tr><td><label for="fillby">Fill By:<br /><span>(ex. YYYY-MM-DD)</span></label></td><td>&nbsp;&nbsp;<input type="text" id="fillby" /></td></tr>')
+             .append('<tr><td colspan="2" align="center"><input type="submit" id="btnNewInv" value="File New Invoice" /></td></tr>');
+      $content.append('<div id="new_inv" />').find('#new_inv')
+              .append( $frmInv );
+      $content.find('#frmInv').submit(function(e) {
+        e.preventDefault();
+        if( $(this).find('#req_type option:selected').attr('id')=='dflt' || $(this).find('#descr').val()==''
+          || $(this).find('#cost').val() == '' || isNaN(parseFloat($(this).find('#cost').val())) ||
+          $(this).find('#fillby').val() == '' || $(this).find('#fillby').val().substring(4,5)!='-' ||
+          $(this).find('#fillby').val().substring(7,8)!='-') {
+          alert('Please fill out the form correctly.');
+        } else {        
+          var qry = "INSERT INTO invoice values (DEFAULT,'"+ session_userid +"','";
+          qry += $(this).find('#req_type option:selected').data('request_data').id;
+          qry += "','"+ parseFloat($(this).find('#cost').val()) +"','"+ $(this).find('#descr').val() +"',current_date,'"+ $(this).find('#fillby').val() +"')";
+          $.post('cgi-bin/query.cgi', {query:qry}, function() {
+            MsgHandler.addMsg('New Invoice successfully filed.');
+            MsgHandler.showMsg();
+            setTimeout(function() {
+                $('#create_invoice').trigger('click');
+            }, 1000);
+          });
+        }
+        return false;
+      });
+      // Show Invoice History
+      $content.append('<div id="inv_hist" />').find('#inv_hist')
+              .append( $table );
+    });
+  };
 
   // Show Students Class Information
   var stud_showClassInfo = function() {
@@ -143,6 +213,7 @@ var ApplicationObj = (function() {
     $content.html(head);
     // Add a drop down with classes
     $dropList = $content.append('<select id="classDropList"/>').find('#classDropList').append('<option id="dflt">Select Class</option>');
+
     for( var i=0; i< classgradelist.numCourses; ++i) {
       $dropList.append('<option id="option'+i+'">'+ classgradelist['class'+i].coursenum + ' - ' + classgradelist['class'+i].coursename +'</option>');
       $content.find('#classDropList #option'+i).data('coursename',classgradelist['class'+i].coursename);
@@ -157,11 +228,10 @@ var ApplicationObj = (function() {
   // Prof Grading change in select
   var prof_grade_selectChange = function() {
     if($content.find('#classDropList option:selected').attr('id') != 'dflt'){
-      var index = $content.find('#classDropList option:selected').data('classnum') - 1;
-
+      var index = $content.find('#classDropList option:selected').prev().length;
       $roster = $content.find('#gradingRoster');
       $roster.html('<span>' + classgradelist['class'+index].coursename + '</span>');
-      for( var i=0; i< classgradelist['class'+index].numStudents; ++i) {
+      for( var i=0; classgradelist['class'+index].roster !=null && i< classgradelist['class'+index].numStudents; ++i) {
         var student = classgradelist['class'+index].roster['student'+i];
         $roster.append('<div class="student" id="student'+i+'" />').find('#student'+i)
                 .append('<div>Student ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+ student.studentid + '<br />Student Name: ' + student.lname +', '+ student.fname + '</div>')
@@ -508,7 +578,7 @@ var ApplicationObj = (function() {
               MsgHandler.addMsg('Successfully assigned class(es) to Prof. ' + $(prof).data('lname') + '.');
               MsgHandler.showMsg();
               setTimeout(function() {
-                $('#admin_show_emp').trigger('click');
+                $('#admin_assign_classes').trigger('click');
               }, 4000);
             });
           });
@@ -528,31 +598,71 @@ var ApplicationObj = (function() {
     $content.html(head);
     
     // Add request types
-    $AddReqType = $content.append('<div id="add_req" />').find('#add_req');
+    $AddReqType = $content.append('<div id="ad_req" />').find('#ad_req');
     $AddReqType.append('<span>Add Request Types:</span>');
     
-    $frmAddReq = $('<form id="add_req" action="#" method="POST" />')
+    $frmAddReq = $('<form id="frmadd_req" action="#" method="POST" />')
                     .append('<label for="req_desc">Description:</label> <input type="text" id="req_desc" />')
-                    .append('<input type="submit" id="btnAddReq" value="Add Request" />');
-    $AddReqType.append($frmAddReq);
+                    .append('<br /><input type="submit" id="btnAddReq" value="Add Request" />');
     
     $reqBox = $('<div id="req_box" />');
     if ( qry_result==null ) {
       $reqBox.append('<div>There are currently no requests</div>');
     } else{
       for( var i=0; i<qry_result.numTuples; ++i) {
-        $reqBox.append('<div>' + qry_result['tuple'+i] + '</div>');
+        $reqBox.append('<div>' + qry_result['tuple'+i].req_desc + '</div>');
       }
     }
-    $AddReqType.append($reqBox);
-    $content.find('#add_req').submit( function(e) {
+    $AddReqType.append($frmAddReq)
+                .append($reqBox)
+                .append('<div style="clear:both"></div>');
+    $content.find('#frmadd_req').submit( function(e) {
       e.preventDefault();
       if( $(this).find('input#req_desc').val() != '' ) {
-        $.post('cgi-bin/query.cgi', {query:'Insert into request_type values (DEFAULT,\'' +  + '\')'}, function() {
-          
+        $(this).find('input#btnAddReq').attr('disabled','disabled').val('Adding...');
+        $.post('cgi-bin/query.cgi', {query:'Insert into request_type values (DEFAULT,\'' + $(this).find('input#req_desc').val() + '\')'}, function() {
+          MsgHandler.addMsg('Successfully added new msg.');
+          MsgHandler.showMsg();
+          setTimeout(function() {
+            $('#admin_manage_inv').trigger('click');
+          }, 1000);
         });
       }
       return false;
+    });
+    
+    // Approve Invoices
+    $ApproveInvoice = $content.append('<div id="app_inv" />').find('#app_inv');
+    $ApproveInvoice.append('<span>Approve Invoices:</span>');
+    var qry = "SELECT i.id,u.lname,u.fname,r.req_desc,i.description,i.cost,i.madeon,i.fillby,i.approved";
+    qry+=" FROM users as u, invoice as i, request_type as r where u.id=i.userid and i.requestid=r.id and fillby>=current_date order by i.approved,i.fillby,u.lname,u.fname";
+    $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+      $content.append(data);
+      if( qry_result == null ) {
+        $ApproveInvoice.append('<br /><span>There are currently no invoices.</span>');
+      } else {
+        $ApproveInvoice.append('<table class="invoices" />').find('.invoices')
+                        .append('<thead><tr><th>Name</th><th>Request Type</th><th width="20%" style="overflow:auto;">Description</th><th>Cost</th><th>Made On</th><th>Fill By</th><th width="5%"></th></tr></thead>')
+                        .append('<tbody />');
+        for( var i=0; i<qry_result.numTuples; ++i ) {
+          var inv = qry_result['tuple'+i];
+          var row = '<tr><td>' +inv.fname+' '+inv.lname+ '</td><td>' +inv.req_desc+ '</td><td>';
+          row += inv.description+ '</td><td>' +inv.cost+ '</td><td>' +inv.madeon+ '</td><td>' +inv.fillby;
+          row += '</td><td><input type="checkbox" id="approve" ' +(inv.approved == 't' ? 'checked' : '')+ '/></td></tr>';
+          $ApproveInvoice.find('table tbody')
+                          .append(row).find('#approve:last')
+                          .data('invoice', inv);
+        }
+        $('#approve').die('click').live('click', function() {
+          var inv = $(this).data('invoice');
+          var checked = $(this).is(':checked');
+          var qry = "UPDATE invoice SET approved='" +checked+ "' where id='" +inv.id+ "'";
+          $.post('cgi-bin/query.cgi', {query:qry}, function() {
+            MsgHandler.addMsg('Successfully ' +(checked?'approved':'disapproved')+ ' invoice.');
+            MsgHandler.showMsg();
+          });
+        });
+      }
     });
   };
 
@@ -579,6 +689,15 @@ var ApplicationObj = (function() {
         $content.append(data);
         showPersonalInfo(head);
         addBlur(person);
+      });
+    });
+    
+    $('#create_invoice').live('click', function() {
+      var head='<h3>Create Invoice</h3>';
+      var qry ="select * from invoice as i, request_type as r where i.requestid=r.id and i.userid='" +session_userid+ "' order by madeon";
+      $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+        $content.append(data);
+        create_invoices(head);
       });
     });
     
@@ -683,7 +802,7 @@ var ApplicationObj = (function() {
     
     $('#admin_manage_inv').live('click', function() {
       var head='<h3>Manage Invoices</h3>';
-      var qry ="select * from request_type";
+      var qry ="select * from request_type order by req_desc";
       $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
         $content.append(data);
         admin_manageInv(head);

@@ -17,6 +17,7 @@
   <?
     echo "<title>Polytechnic IUDIS - Advisor Home: ". $_SESSION['username'] ."</title>";
   ?>
+  <link rel="shortcut icon" href="favicon1.ico">
   <link charset="utf-8" title="no title" media="screen" type="text/css" href="css/styles.css" rel="stylesheet">
   <script type="text/javascript" charset="utf-8" src="js/jquery-1.3.2.min.js"></script>
   <script type="text/javascript" charset="utf-8" src="js/application.js"></script>
