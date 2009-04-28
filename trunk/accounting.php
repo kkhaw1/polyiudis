@@ -39,6 +39,7 @@
     <div id="links">
       <a href="index.php">Home</a>
       <a href="about.php">About</a>
+      <a href="#" id="admin_manage_inv">Manage Invoices</a>
       <a href="#" id="create_invoice">Create Invoice</a>
       <a href="#" id="p_info">View Personal Information</a>
       <a href="#" id="logout" class="last">Logout</a>

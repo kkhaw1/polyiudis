@@ -42,6 +42,7 @@
       <a href="#" id="adv_s_list">Students List</a>
       <a href="#" id="adv_n_stud">Add New Student</a>
       <a href="#" id="adv_r_class">Register Student</a>
+      <a href="#" id="create_invoice">Create Invoice</a>
       <a href="#" id="p_info">View Personal Information</a>
       <a href="#" id="logout" class="last">Logout</a>
     </div>

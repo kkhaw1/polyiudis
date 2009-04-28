@@ -39,12 +39,13 @@
     <div id="links">
       <a href="index.php">Home</a>
       <a href="about.php">About</a>
-      <a href="#" id="admin_show_emp">Employee Lists</a>
+      <a href="#" id="admin_show_emp">Employees</a>
       <a href="#" id="admin_add_emp">New Hire</a>
+      <a href="#" id="admin_add_class">New Class</a>
       <a href="#" id="admin_assign_classes">Assign Classes</a>
       <a href="#" id="admin_manage_inv">Manage Invoices</a>
       <a href="#" id="create_invoice">Create Invoice</a>
-      <a href="#" id="p_info">View Personal Information</a>
+      <a href="#" id="p_info">My Information</a>
       <a href="#" id="logout" class="last">Logout</a>
     </div>
   </div>

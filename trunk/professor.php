@@ -42,6 +42,7 @@
       <a href="about.php">About</a>
       <a href="#" id="prof_c_list">View Classes</a>
       <a href="#" id="prof_grades">Grade Students</a>
+      <a href="#" id="create_invoice">Create Invoice</a>
       <a href="#" id="p_info">View Personal Information</a>
       <a href="#" id="logout" class="last">Logout</a>
     </div>
@@ -58,7 +59,7 @@
     </div>
     
     <div id="left_col">
-      <div style="font-size:85%;">Signed in as <strong><?php echo $_SESSION['username']; ?></strong>.</div>
+      <div style="font-size:85%;">Signed in as <strong>&laquo;<?php echo $_SESSION['username']; ?>&raquo;</strong>.</div>
       <div id="content"></div>
     </div>
     
