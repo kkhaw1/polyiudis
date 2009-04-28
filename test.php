@@ -1,3 +1,6 @@
+<?php
+  session_start();
+?>
 <html>
 
 <head>
@@ -8,11 +11,17 @@
   
   <script type="text/javascript">
     $(document).ready( function(){
-      $('#nav_bar a:last').addClass('selected');
-      $('#login').css({fontWeight:'bold'});
+      if( <?php echo isset($_SESSION['userid']) ? 'true' : 'false' ; ?>) {
+        $('#login').html('<div>You are logged in as <b><?php echo $_SESSION['username']; ?></b><br /><a href="<?php echo $_SESSION['role']; ?>" style="color:#00F;">&laquo;Go Back</a></div>');
+        $('#links a:last').text('Logout').attr('href','cookie.php?action=logout');
+        $('#login').append('<a href="changePass.php" style="color:#00F">Change Your Password?</a>');
+      } else {
+        document.getElementById('username').focus();
+      }
+
       if ( window.location.href.match(/error=true/) ) {
       	MsgHandler.addMsg("Username and password combination not found.");
-      	MsgHandler.showMsg();
+      	MsgHandler.showError();
       }
 
       $('input').focus( function(){$(this).addClass('selected');}).blur( function() {$(this).removeClass('selected');});
@@ -35,7 +44,7 @@
   <title>Integrated University Department Information System</title>
 </head>
 
-<body onload="document.getElementById('username').focus()">
+<body>
 
   <div id="head">
     <div id="right_title" class="title"><a href="http://www.poly.edu">Polytechnic Institute of NYU</a></div>
@@ -44,7 +53,7 @@
 
   <div id="nav_bar">
     <div id="links">
-      <a href="index.php">Home</a>
+      <a href="index.php" class="selected">Home</a>
       <a href="about.php">About</a>
       <a href="login.html" class="last">Login</a>
     </div>
@@ -62,7 +71,7 @@
         <form method="POST" action="cgi-bin/login.cgi" name="frmLogin" id="frmLogin">
       	  <label for="username">Username:&nbsp;</label><input type="text" name="username" id="username" /><br />
           <label for="pwd">Password:&nbsp;&nbsp;</label><input type="password" name="pwd" id="pwd" /><br />
-          <button id="login">Login</button><br />
+          <button id="login">Login</button><br/>
           <a href="changePass.php" style="color:#00F">Forgot Your Password?</a>
         </form>
       </div>

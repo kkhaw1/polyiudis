@@ -68,7 +68,6 @@ var ApplicationObj = (function() {
     } else {
       for( var i=0; i < qry_result.numTuples; ++i ) {
         var inv = qry_result['tuple'+i];
-        console.log(inv);
         $table.find('tbody').append('<tr />').find('tr:last')
               .append('<td>' +inv.madeon+ '</td>')
               .append('<td>' +inv.req_desc+ '</td>')
@@ -164,6 +163,14 @@ var ApplicationObj = (function() {
     }
   };
   
+  // Show Stud Grad Reqs
+  var showGradReq = function(head) {
+    $content.html(head);
+    var degreeid = qry_result.tuple0.degreeid;
+    var qry = "SELECT r.coursenum,m.degreename,m.degreelevel FROM requirements AS r, majors AS m WHERE r.degreeid=m.degreeid AND r.degreeid='" +degreeid+ "'";
+    $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {});
+  }
+  
   // Show Prof Roster
   var prof_showRoster = function() {
     $content.find('.view_roster').die('click');
@@ -228,7 +235,7 @@ var ApplicationObj = (function() {
   // Prof Grading change in select
   var prof_grade_selectChange = function() {
     if($content.find('#classDropList option:selected').attr('id') != 'dflt'){
-      var index = $content.find('#classDropList option:selected').prev().length;
+      var index = $content.find('#classDropList option:selected').prevAll().length -1;
       $roster = $content.find('#gradingRoster');
       $roster.html('<span>' + classgradelist['class'+index].coursename + '</span>');
       for( var i=0; classgradelist['class'+index].roster !=null && i< classgradelist['class'+index].numStudents; ++i) {
@@ -545,6 +552,36 @@ var ApplicationObj = (function() {
     });
   };
   
+  // Admin Add new Class
+  var admin_addClass = function(head) {
+    $content.html(head);
+
+    $form = $content.append('<form id="frmAddClass" method="POST" action="cgi-bin/query.cgi" />').find('#frmAddClass');
+    $form.append('<table id="admin_tblNewClass" />').find('table').append('<tbody />').find('tbody')
+          .append('<tr><td><label for="crsnum">Course Number:</label></td><td><input type="text" id="crsnum" /></td></tr>')
+          .append('<tr><td><label for="crsname">Course Name:</label></td><td><input type="text" id="crsname" /></td></tr>')
+          .append('<tr><td><label for="credits">Credits:</label></td><td><input type="text" id="credits" maxlength="1" /></td></tr>')
+          .append('<tr><td>&nbsp;</td><td><input type="submit" id="btnAdd" style="padding:3px;border:1px solid #000;cursor:pointer;" value="Create New Class" /></td></tr>');
+
+    $('#frmAddClass').submit( function(e) {
+      e.preventDefault();
+      if( $content.find('#crsnum').val() == '' || $content.find('#crsname').val() == '' || $content.find('#credits').val() == '' || isNaN(parseInt($content.find('#credits').val())) ) {
+        alert("Please fill out completely, and try again.");
+        return false;
+      } else {
+        var qry = "INSERT INTO course VALUES (DEFAULT,'"+$content.find('#crsnum').val()+"','"+$content.find('#crsname').val()+"','"+$content.find('#credits').val()+"',null,(SELECT term FROM curr_term))";
+        $.post('cgi-bin/query.cgi', {query:qry}, function() {
+          MsgHandler.addMsg('Successfully created ' + $content.find('#crsnum').val() +'-'+$content.find('#crsname').val()+ ' as a new Class.');
+          MsgHandler.showMsg();
+          setTimeout(function() {
+            $('#admin_assign_classes').trigger('click');
+          }, 1000);
+        });
+      }
+      return false;
+    });
+  };
+  
   // Admin Show Assign classes
   var admin_assignClass = function(head) {
     var prof_id;
@@ -559,38 +596,50 @@ var ApplicationObj = (function() {
     for( var i=0; i<qry_result.numTuples; ++i) {
       $prof.append('<div id="prof'+qry_result['tuple'+i].id+'"> ' + qry_result['tuple'+i].lname + ', ' + qry_result['tuple'+i].fname + '<div id="courses" /> </div>');
       $prof.find('#prof' + qry_result['tuple'+i].id).data('id', qry_result['tuple'+i].id).data('lname', qry_result['tuple'+i].lname);
+        
       $prof.find('div').die('click').live('click', function(){
         var prof = this;
-        $(prof).css({color:'#444',border:'1px dotted #000'});
-        var qry='select * from course where instructorid is null';
-        $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
-          $crs.html(data);
-          for( var j=0; j< qry_result.numTuples; j++ ) {
-            $crs.append('<div id="crs' +qry_result['tuple'+j].classnum+ '" style="cursor:pointer;padding:3px;"> ' + qry_result['tuple'+j].coursenum + ' - ' + qry_result['tuple'+j].name + ' </div>');
-            $crs.find('#crs'+qry_result['tuple'+j].classnum).data('classnum', qry_result['tuple'+j].classnum);
-            $crs.find('#crs'+qry_result['tuple'+j].classnum).data('coursenum', qry_result['tuple'+j].coursenum);
-            $crs.find('#crs'+qry_result['tuple'+j].classnum).data('name', qry_result['tuple'+j].name);
+        $(prof).css({color:'#444',border:'1px dotted #000',backgroundColor:'#DDD'});
+        var subqry = "select * from course where instructorid='" + $(prof).data('id') + "' and term=(Select term from curr_term) order by coursenum";
+        
+        $.post('cgi-bin/query2.cgi', {query:subqry}, function(data) {
+          $content.append(data);
+          for( var i=0; qry_result!=null && i<qry_result.numTuples; ++i) {
+            var crs = qry_result['tuple'+i];
+            $(prof).find('#courses').append('<span id="' + crs.id + '" style="color:#050">' + crs.coursenum + '</span>, ');
           }
-          $content.append('<input id="btnAssignClass" type="button" value="Assign Class(es)" />').find('#btnAssignClass').click( function(){
-            var qry = "Update course set instructorid='" + $(prof).data('id') + "' where classnum='" + $(prof).find('span:first').attr('id') + "'";
-            for( var q=1; q < $(prof).find('span').length; ++q ) { qry+=" or classnum='" + $(prof).find('span:eq(' + q + ')').attr('id') + "'";}
-            $.post('cgi-bin/query.cgi', {query:qry}, function() {
-              MsgHandler.addMsg('Successfully assigned class(es) to Prof. ' + $(prof).data('lname') + '.');
-              MsgHandler.showMsg();
-              setTimeout(function() {
-                $('#admin_assign_classes').trigger('click');
-              }, 4000);
-            });
-          });
-          $crs.find('div').die('click').live('click', function(){
-            if ( $(prof).find('span#' + $( '#' + $(this).attr('id') ).data('classnum')).length == 0 ) {
-              $(prof).find('#courses').append('<span id="' + $('#' + $(this).attr('id')).data('classnum') + '">' + $('#' + $(this).attr('id')).data('coursenum') + '</span>, ')
-            }
-          });
           
+          var qry='select * from course where instructorid is null';
+          $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+            $crs.html(data);
+            for( var j=0; j< qry_result.numTuples; j++ ) {
+              $crs.append('<div id="crs' +qry_result['tuple'+j].classnum+ '" style="cursor:pointer;padding:3px;"> ' + qry_result['tuple'+j].coursenum + ' - ' + qry_result['tuple'+j].name + ' </div>');
+              $crs.find('#crs'+qry_result['tuple'+j].classnum).data('classnum', qry_result['tuple'+j].classnum);
+              $crs.find('#crs'+qry_result['tuple'+j].classnum).data('coursenum', qry_result['tuple'+j].coursenum);
+              $crs.find('#crs'+qry_result['tuple'+j].classnum).data('name', qry_result['tuple'+j].name);
+            }
+            $content.append('<input id="btnAssignClass" type="button" value="Assign Class(es)" />').find('#btnAssignClass').click( function(){
+              var qry = "Update course set instructorid='" + $(prof).data('id') + "' where classnum='" + $(prof).find('span:first').attr('id') + "'";
+              for( var q=1; q < $(prof).find('span').length; ++q ) { qry+=" or classnum='" + $(prof).find('span:eq(' + q + ')').attr('id') + "'";}
+              $.post('cgi-bin/query.cgi', {query:qry}, function() {
+                MsgHandler.addMsg('Successfully assigned class(es) to Prof. ' + $(prof).data('lname') + '.');
+                MsgHandler.showMsg();
+                setTimeout(function() {
+                  $('#admin_assign_classes').trigger('click');
+                }, 4000);
+              });
+            });
+            $crs.find('div').die('click').live('click', function(){
+              if ( $(prof).find('span#' + $( '#' + $(this).attr('id') ).data('classnum')).length == 0 ) {
+                $(prof).find('#courses').append('<span id="' + $('#' + $(this).attr('id')).data('classnum') + '">' + $('#' + $(this).attr('id')).data('coursenum') + '</span>, ')
+              }
+            });
+            
+          });
         });
       });
-    }    
+    }
+    
   };
 
   // Show Admin manage invoices
@@ -653,6 +702,16 @@ var ApplicationObj = (function() {
                           .append(row).find('#approve:last')
                           .data('invoice', inv);
         }
+        
+        $totalInv = $content.append('<div id="total_inv"/>').find('#total_inv');
+        $totalInv.append('<span>Total approved charges: <span id="ttl" style="line-height:25px;background-color:#CCC;"></span></span>');
+        var subqry = "select sum(cost) from invoice where approved='t'";
+        $.post('cgi-bin/query2.cgi', {query:subqry}, function(data) {
+          $content.append(data);
+          $totalInv.find('#ttl').text( qry_result.tuple0.sum=='' ? '$0.00':qry_result.tuple0.sum   );
+        });
+
+        
         $('#approve').die('click').live('click', function() {
           var inv = $(this).data('invoice');
           var checked = $(this).is(':checked');
@@ -660,6 +719,9 @@ var ApplicationObj = (function() {
           $.post('cgi-bin/query.cgi', {query:qry}, function() {
             MsgHandler.addMsg('Successfully ' +(checked?'approved':'disapproved')+ ' invoice.');
             MsgHandler.showMsg();
+            setTimeout(function() {
+              $('#admin_manage_inv').trigger('click');
+            }, 1000);
           });
         });
       }
@@ -717,9 +779,11 @@ var ApplicationObj = (function() {
       });
     });
     $('#grad').live( 'click', function() {
-      $content.html('').html('<h3>Graduation Requirements</h3>');
-      $.post('cgi-bin/', {userid:session_userid}, function(data) {
+      var head = '<h3>Graduation Requirements</h3>';
+      var qry = "SELECT degreeid from students where userid='" +session_userid+ "'";
+      $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
         $content.append(data);
+        showGradReq();
       });
     });
     /*-End Students-*/
@@ -789,6 +853,11 @@ var ApplicationObj = (function() {
         $content.append(data);
         admin_addNewHire(head);
       });
+    });
+
+    $('#admin_add_class').live( 'click', function() {
+      var head='<h3>Add Class</h3>';
+      admin_addClass(head);
     });
     
     $('#admin_assign_classes').live( 'click', function() {

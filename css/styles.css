@@ -276,7 +276,7 @@ a, a:visited, a:hover {
   font-size:12px;
   padding:3px 5px;
 }
-#adv_new_stud, #admin_tblNewHire {
+#adv_new_stud, #admin_tblNewHire, #admin_tblNewClass {
   border:1px solid #CCC;
   margin:auto;
   padding:3px;
@@ -284,7 +284,7 @@ a, a:visited, a:hover {
   font-size:12px;
   text-align:center;
 }
-#adv_new_stud input, #admin_tblNewHire input {
+#adv_new_stud input, #admin_tblNewHire input, #admin_tblNewClass input {
   border:1px solid #000;
   width:125px;
 }
@@ -325,20 +325,23 @@ a, a:visited, a:hover {
   z-index:1;
   cursor:pointer;
 }
+#crs div {
+  border-bottom:1px dotted #AAA;
+}
 p#help_info {
   margin:3px 3px;
   padding:15px 3px;
   font-size:11px;
   
 }
-#ad_req, #app_inv {
+#ad_req, #app_inv, #total_inv {
   border:1px dotted #000;
   margin:3px 5px 2em 5px;
   padding:3px 5px;
   font-size:12px;
   text-align:left;
 }
-#ad_req span, #app_inv span {
+#ad_req span, #app_inv span, #total_inv span {
   font-weight:bold;
   font-size:105%;
 }
@@ -384,7 +387,7 @@ p#help_info {
   padding:3px 5px;
   text-align:left;
 }
-#new_inv #tblInv, #frmInv input{
+#new_inv #tblInv, #frmInv input, #frmPass table, #frmPass table input {
   font-size:12px;
   border:1px solid #000;  
 }
