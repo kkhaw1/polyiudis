@@ -167,8 +167,15 @@ var ApplicationObj = (function() {
   var showGradReq = function(head) {
     $content.html(head);
     var degreeid = qry_result.tuple0.degreeid;
-    var qry = "SELECT r.coursenum,m.degreename,m.degreelevel FROM requirements AS r, majors AS m WHERE r.degreeid=m.degreeid AND r.degreeid='" +degreeid+ "'";
-    $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {});
+    var qry = "SELECT r.coursenum,r.credits,m.degreename,m.degreelevel FROM requirements AS r, majors AS m WHERE r.degreeid=m.degreeid AND r.degreeid='" +degreeid+ "'";
+    $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
+      $content.append(data);
+      $content.append('<div id="reqs" />').find('#reqs').append('<h3>Gradutation Requirements' + (qry_result!=null ? '<br>for<br>'+qry_result.tuple0.degreename+' - '+qry_result.tuple0.degreelevel : '' ) + '</h3>');
+      for( var i=0; qry_result!=null && i<qry_result.numTuples; ++i) {
+        var req = qry_result['tuple'+i];
+        $content.find('#reqs').append('<div class="requirement"><span>' + req.coursenum + '</span>, <span>' + req.credits + ' credits<span></div>');//qry_result
+      }
+    });
   }
   
   // Show Prof Roster
@@ -195,7 +202,7 @@ var ApplicationObj = (function() {
     $list = $list.append('<tbody />').find('tbody');
     for( var i=0; i < classlist.numCourses; ++i) {
       $list.append('<tr />').find('tr:last')
-            .append('<td class="view_roster" id="roster'+i+'"><img src="minus.png" /></td>')
+            .append('<td class="view_roster" id="roster'+i+'"><img src="img/minus.png" /></td>')
             .append('<td id="coursenum">'+ classlist['class' + i].coursenum +'</td>')
             .append('<td id="coursename">'+ classlist['class' + i].name +'</td>')
             .append('<td id="term">'+ classlist['class' + i].term +'</td>')
@@ -594,33 +601,49 @@ var ApplicationObj = (function() {
     $crs = $content.append('<div id="crs"></div>').find('#crs');
     $prof = $content.append('<div style="font-size:12px;font-weight:bold;">Professors:</div><div id="profs"/>').find('#profs');
     for( var i=0; i<qry_result.numTuples; ++i) {
-      $prof.append('<div id="prof'+qry_result['tuple'+i].id+'"> ' + qry_result['tuple'+i].lname + ', ' + qry_result['tuple'+i].fname + '<div id="courses" /> </div>');
-      $prof.find('#prof' + qry_result['tuple'+i].id).data('id', qry_result['tuple'+i].id).data('lname', qry_result['tuple'+i].lname);
+      var curr_prof = qry_result['tuple'+i];
+      $prof.append('<div id="prof' + curr_prof.id + '" class="professor"><a href="#" class="prof_link" id="' +curr_prof.id+ '">' +curr_prof.lname+', ' +curr_prof.fname+ '</a><div id="courses" /></div>');
+      $prof.find('.professor a#'+curr_prof.id).data('id', curr_prof.id).data('lname', curr_prof.lname);
+      //$prof.append('<div id="prof'+qry_result['tuple'+i].id+'"> ' + qry_result['tuple'+i].lname + ', ' + qry_result['tuple'+i].fname + '<div id="courses" /> </div>');
+      //$prof.find('#prof' + qry_result['tuple'+i].id).data('id', qry_result['tuple'+i].id).data('lname', qry_result['tuple'+i].lname);
         
-      $prof.find('div').die('click').live('click', function(){
-        var prof = this;
-        $(prof).css({color:'#444',border:'1px dotted #000',backgroundColor:'#DDD'});
+      $prof.find('.professor a.prof_link').die('click').live('click', function(){
+        var prof = $(this);
+
+        $prof.find('#prof'+$(prof).data('id')).css({color:'#444',border:'1px dotted #000',backgroundColor:'#DDD'});
         var subqry = "select * from course where instructorid='" + $(prof).data('id') + "' and term=(Select term from curr_term) order by coursenum";
-        
+
         $.post('cgi-bin/query2.cgi', {query:subqry}, function(data) {
           $content.append(data);
           for( var i=0; qry_result!=null && i<qry_result.numTuples; ++i) {
             var crs = qry_result['tuple'+i];
-            $(prof).find('#courses').append('<span id="' + crs.id + '" style="color:#050">' + crs.coursenum + '</span>, ');
+            $prof.find('#prof'+$(prof).data('id')+' #courses').append('<a href="#" class="crs_link" id="' + crs.classnum + '" style="color:#050 ">' + crs.coursenum + '</a>, ');
+            $prof.find('#prof'+$(prof).data('id')+' #courses a.crs_link').click(function() {
+              var qry = "UPDATE course SET instructorid=null where classnum='" + $(this).attr('id') + "'";
+              $.post('cgi-bin/query.cgi', {query:qry}, function(){
+                MsgHandler.addMsg('Successfully unassigned class.');
+                MsgHandler.showMsg();
+                setTimeout(function() {
+                  $('#admin_assign_classes').trigger('click');
+                }, 500);
+              });
+            });
           }
-          
+
           var qry='select * from course where instructorid is null';
           $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
             $crs.html(data);
-            for( var j=0; j< qry_result.numTuples; j++ ) {
+            for( var j=0; qry_result!=null && j < qry_result.numTuples; j++ ) {
               $crs.append('<div id="crs' +qry_result['tuple'+j].classnum+ '" style="cursor:pointer;padding:3px;"> ' + qry_result['tuple'+j].coursenum + ' - ' + qry_result['tuple'+j].name + ' </div>');
               $crs.find('#crs'+qry_result['tuple'+j].classnum).data('classnum', qry_result['tuple'+j].classnum);
               $crs.find('#crs'+qry_result['tuple'+j].classnum).data('coursenum', qry_result['tuple'+j].coursenum);
               $crs.find('#crs'+qry_result['tuple'+j].classnum).data('name', qry_result['tuple'+j].name);
             }
             $content.append('<input id="btnAssignClass" type="button" value="Assign Class(es)" />').find('#btnAssignClass').click( function(){
-              var qry = "Update course set instructorid='" + $(prof).data('id') + "' where classnum='" + $(prof).find('span:first').attr('id') + "'";
-              for( var q=1; q < $(prof).find('span').length; ++q ) { qry+=" or classnum='" + $(prof).find('span:eq(' + q + ')').attr('id') + "'";}
+              var qry = "Update course set instructorid='" + $(prof).data('id') + "' where classnum='" + $prof.find('#prof'+$(prof).data('id')+' #courses a.crs_link:first').attr('id') + "'";
+              for(var q=1;q < $prof.find('#prof'+$(prof).data('id')+' #courses').find('a.crs_link').length; ++q ) {
+                qry+=" or classnum='" + $prof.find('#prof'+$(prof).data('id')+' #courses a.crs_link:eq('+q+')').attr('id') + "'";
+              }
               $.post('cgi-bin/query.cgi', {query:qry}, function() {
                 MsgHandler.addMsg('Successfully assigned class(es) to Prof. ' + $(prof).data('lname') + '.');
                 MsgHandler.showMsg();
@@ -630,8 +653,8 @@ var ApplicationObj = (function() {
               });
             });
             $crs.find('div').die('click').live('click', function(){
-              if ( $(prof).find('span#' + $( '#' + $(this).attr('id') ).data('classnum')).length == 0 ) {
-                $(prof).find('#courses').append('<span id="' + $('#' + $(this).attr('id')).data('classnum') + '">' + $('#' + $(this).attr('id')).data('coursenum') + '</span>, ')
+              if( $prof.find('#prof' +$(prof).data('id')+ ' #courses a#' + $('#'+$(this).attr('id')).data('classnum') ).length == 0 ) {
+                $prof.find('#prof' +$(prof).data('id')+ ' #courses').append('<a href="#" class="crs_link" id="' + $('#' + $(this).attr('id')).data('classnum') + '">' + $('#' + $(this).attr('id')).data('coursenum') + '</a>, ')
               }
             });
             
@@ -783,7 +806,7 @@ var ApplicationObj = (function() {
       var qry = "SELECT degreeid from students where userid='" +session_userid+ "'";
       $.post('cgi-bin/query2.cgi', {query:qry}, function(data) {
         $content.append(data);
-        showGradReq();
+        showGradReq(head);
       });
     });
     /*-End Students-*/

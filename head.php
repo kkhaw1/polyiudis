@@ -25,6 +25,7 @@
   <script type="text/javascript" charset="utf-8">
     $(document).ready( function() {
       ApplicationObj.init( <?php echo $_SESSION['userid'] .',\''. $_SESSION['role'] .'\',\''. $_SESSION['username'] .'\''; ?> );
+      $('#admin_show_emp').trigger('click');
     });
   </script>
 </head>
@@ -38,7 +39,6 @@
   <div id="nav_bar">
     <div id="links">
       <a href="index.php">Home</a>
-      <a href="about.php">About</a>
       <a href="#" id="admin_show_emp">Employees</a>
       <a href="#" id="admin_add_emp">New Hire</a>
       <a href="#" id="admin_add_class">New Class</a>

@@ -5,7 +5,6 @@ Group B6
 Available to view on:
 http://pdc-amd01.poly.edu/~kkhawa01/polyiudis/
 
-Still working on adding the other features.
+Completed.
 
-Need to add request service for advisors, professors, accountants, lab, and head
 

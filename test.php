@@ -54,7 +54,6 @@
   <div id="nav_bar">
     <div id="links">
       <a href="index.php" class="selected">Home</a>
-      <a href="about.php">About</a>
       <a href="login.html" class="last">Login</a>
     </div>
   </div>
@@ -80,6 +79,26 @@
     
     <div id="left_col">
       <p>Welcome to polyIUDIS, an online department wide information system.</p>
+      <p style="text-align:left;">polyIUDIS, the Integrated University Department Information System, was
+       developed as solution to handling all of a University's Computer Science and 
+       Engineering Department wide needs.  PolyIUDIS utilizes a clean and simple layout to allow easy navigation.</p>
+      <div id="list_box">
+      <h4>Manage Courses</h4>
+        <li>Add new classes</li>
+        <li>Assign who will teach courses</li>
+        <li>View Rosters</li>
+      <h4>Manage Course Grades</h4>
+        <li>View Grades</li>
+        <li>Assign Grades</li>
+      <h4>Manage Student Records</h4>
+        <li>Create Student Accounts</li>
+        <li>View Student Records</li>
+        <li>Register for Classes</li>
+      <h4>Manage Invoices</h4>
+        <li>Filing Invoices</li>
+        <li>Approving Speding</li>
+        <li>Budgets</li>
+      </div>
     </div>
     
     <div style="clear:right;"></div>
