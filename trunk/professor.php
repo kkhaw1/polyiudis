@@ -24,6 +24,7 @@
     <script type="text/javascript" charset="utf-8">
       $(document).ready( function() {
         ApplicationObj.init( <?php echo $_SESSION['userid'] .',\''. $_SESSION['role'] .'\',\''. $_SESSION['username'] .'\''; ?> );
+        $('#prof_c_list').trigger('click');
       });
     </script>
 </head>
@@ -39,7 +40,6 @@
   <div id="nav_bar">
     <div id="links">
       <a href="index.php">Home</a>
-      <a href="about.php">About</a>
       <a href="#" id="prof_c_list">View Classes</a>
       <a href="#" id="prof_grades">Grade Students</a>
       <a href="#" id="create_invoice">Create Invoice</a>

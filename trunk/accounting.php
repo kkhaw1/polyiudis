@@ -25,6 +25,7 @@
   <script type="text/javascript" charset="utf-8">
     $(document).ready( function() {
       ApplicationObj.init( <?php echo $_SESSION['userid'] .',\''. $_SESSION['role'] .'\',\''. $_SESSION['username'] .'\''; ?> );
+      $('#admin_manage_inv').trigger('click');
     });
   </script>
 </head>
@@ -38,7 +39,6 @@
   <div id="nav_bar">
     <div id="links">
       <a href="index.php">Home</a>
-      <a href="about.php">About</a>
       <a href="#" id="admin_manage_inv">Manage Invoices</a>
       <a href="#" id="create_invoice">Create Invoice</a>
       <a href="#" id="p_info">View Personal Information</a>
