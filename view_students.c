@@ -7,6 +7,8 @@
 #include <libpq-fe.h>
 #include "yacgi12/src/yacgi.h"
 
+#include "DB.h"
+
 void printStudentList();
 
 int main( int argc, char* argv[] ) {
@@ -17,7 +19,7 @@ void printStudentList() {
   char buf[512];
 
   // Get all of the class information stored for user with given userid:
-  PGconn* conn = PQconnectdb( "host=pdc-amd01 user=kkhawa01" );
+  PGconn* conn = PQconnectdb( CONNSTRING );
   if ( PQstatus( conn ) == CONNECTION_BAD ) {
     printf( "Bad connection.%c", 10);
   }
