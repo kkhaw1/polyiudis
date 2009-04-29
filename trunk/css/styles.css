@@ -54,7 +54,7 @@ a, a:visited, a:hover {
 }
 #links a {
   margin:-3px;
-  padding:4px 7px 0px 7px;
+  padding:4px 7px 1px 7px;
   border-top:1px solid #CCC;
   border-left:1px solid #CCC;
   border-right:1px solid #CCC;
@@ -169,15 +169,15 @@ a, a:visited, a:hover {
 #tblPinfo #key{
   padding:1px 4px;
   width:100px;
-  font-size:80%;
+  font-size:14px;
   font-weight:bold;
 }
 #tblPinfo #val{
-  font-size:90%;
+  font-size:14px;
   width:150px;
 }
 #tblPinfo #val input {
-  font-size:75%;
+  font-size:12px;
   border:1px solid #CCC;
   color:#555;
 }

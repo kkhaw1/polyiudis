@@ -29,6 +29,8 @@ qry: select cr.classnum, u.id, u.fname, u.lname, u.email from class_roster as cr
 #include <string.h>
 #include <libpq-fe.h>
 
+#include "DB.h"
+
 void printClassInfo();
 
 int main( int argc, char* argv[] ) {
@@ -43,7 +45,7 @@ void printClassInfo() {
   userid = buf+7;
 
   // Get all of the class information stored for user with given userid:
-  PGconn* conn = PQconnectdb( "host=pdc-amd01 user=kkhawa01" );
+  PGconn* conn = PQconnectdb( CONNSTRING );
   if ( PQstatus( conn ) == CONNECTION_BAD ) {
     printf( "Bad connection.%c", 10);
   }

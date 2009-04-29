@@ -5,6 +5,8 @@
 #include <libpq-fe.h>
 #include "yacgi12/src/yacgi.h"
 
+#include "DB.h"
+
 void processQuery();
 void runQuery( char* );
 
@@ -63,7 +65,7 @@ void runQuery( char *query ) {
   /*-----------------------------------------------------------
   *              Opening PG DB
   *-----------------------------------------------------------*/
-  PGconn* conn = PQconnectdb( "host=pdc-amd01 user=kkhawa01" );
+  PGconn* conn = PQconnectdb( CONNSTRING );
   if ( PQstatus( conn ) == CONNECTION_BAD ) {
     printf( "Bad connection.%c", 10);
   }

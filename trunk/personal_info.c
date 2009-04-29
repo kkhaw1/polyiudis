@@ -5,6 +5,8 @@
 #include <libpq-fe.h>
 #include "yacgi12/src/yacgi.h"
 
+#include "DB.h"
+
 typedef struct {
   int id, zip;
   char *username, *password, *email, *fname, *lname, *address, *city, *state, *role, *phone;
@@ -25,7 +27,7 @@ void printPersonalInfo() {
   userid = buf+7;
 
   // Get all of the information stored for user with given userid:
-  PGconn* conn = PQconnectdb( "host=pdc-amd01 user=kkhawa01" );
+  PGconn* conn = PQconnectdb( CONNSTRING );
   if ( PQstatus( conn ) == CONNECTION_BAD ) {
     printf( "Bad connection.%c", 10);
   }
